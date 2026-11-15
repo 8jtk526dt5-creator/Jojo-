@@ -500,7 +500,7 @@ function standPose(a){
   return mkP(.1+fl*.03,0,[.8,2.2+fl*.1],[1.0,2.3-fl*.1],[-.3,-.1],[.35,.1]);
 }
 function stand(a,alpha){
-  const d=a.d.st,f=a.f,t=a.t,S=1.12;
+  const d=a.d.st,f=a.f,t=a.t,S=1.2,vr=(a.d.stand.length+a.d.stand.charCodeAt(0))%4;
   const k=alpha==null?1:alpha;
   const sx=a.x+f*a.sOff,sy=a.y-9+Math.sin(t*3)*2;
   const P=standPose(a),J=rigJ(sx,sy,f,P,S);
@@ -511,15 +511,43 @@ function stand(a,alpha){
   // aura
   cx.globalAlpha=.16*ap;disc(J.hx,J.hy-14,30,d.glow);cx.globalAlpha=.1*ap;disc(J.hx,J.hy-14,38,d.glow);
   cx.globalAlpha=.92*ap;
-  const th=5;
+  const th=6;
+  // contour lumineux néon
+  cx.globalAlpha=.3*ap;
+  [[J.sx,J.sy,J.aB[0],J.aB[1],th+5],[J.aB[0],J.aB[1],J.aB[2],J.aB[3],th+4],[J.hx,J.hy,J.lB[0],J.lB[1],11],[J.lB[0],J.lB[1],J.lB[2],J.lB[3],9],
+   [J.hx,J.hy,J.sx,J.sy,19],[J.hx,J.hy,J.lF[0],J.lF[1],11],[J.lF[0],J.lF[1],J.lF[2],J.lF[3],9],[J.sx,J.sy,J.aF[0],J.aF[1],th+5],[J.aF[0],J.aF[1],J.aF[2],J.aF[3],th+4]]
+   .forEach(q=>line(q[0],q[1],q[2],q[3],q[4],d.glow));
+  cx.globalAlpha=.92*ap;
+  // écharpe d'énergie flottante
+  for(let i=0;i<8;i++){
+    const rx=J.sx-f*(3+i*5.5),ry=J.sy-3+Math.sin(t*7+i*.8)*(2+i*.5)+i*.9,w=Math.max(1,5-i*.55);
+    if(i<7){const nx=J.sx-f*(3+(i+1)*5.5),ny=J.sy-3+Math.sin(t*7+(i+1)*.8)*(2+(i+1)*.5)+(i+1)*.9;
+      line(rx,ry,nx,ny,w+2,'#0d0718');line(rx,ry,nx,ny,w,i%2?d.glow:d.acc)}
+  }
   limb(J.sx,J.sy,J.aB[0],J.aB[1],th,bd,f);limb(J.aB[0],J.aB[1],J.aB[2],J.aB[3],th-1,d.skin,f);
   limb(J.hx,J.hy,J.lB[0],J.lB[1],5,bd,f);limb(J.lB[0],J.lB[1],J.lB[2],J.lB[3],4,bd,f);
   limb(J.hx,J.hy,J.sx,J.sy,13,body,f);
   fr(J.hx,J.hy,f,-6,-4,12,2,d.acc);rect(J.sx-2,J.sy+4,4,4,d.glow);rect(J.sx-1,J.sy+5,2,2,'#fff');
   limb(J.sx-f*6,J.sy-1,J.sx-f*6,J.sy+4,5,d.acc,f);limb(J.sx+f*6,J.sy-1,J.sx+f*6,J.sy+4,5,d.acc,f);  // épaulières
+  // plastron, veines d'énergie, détails propres à chaque Stand
+  {
+    const mx=(J.hx+J.sx)/2,my=(J.hy+J.sy)/2;
+    line(J.sx-f*5,J.sy+1,mx,my+4,4,'#0d0718');line(J.sx+f*5,J.sy+1,mx,my+4,4,'#0d0718');
+    line(J.sx-f*5,J.sy+1,mx,my+3,2,lt(body,.25));line(J.sx+f*5,J.sy+1,mx,my+3,2,lt(body,.15));
+    rect(mx-3,my-1,6,6,'#0d0718');rect(mx-2,my,4,4,d.acc);rect(mx-1,my+1,2,2,Math.floor(t*4)%2?'#ffffff':d.glow);
+    for(let i=0;i<3;i++)rect(mx-4+i*3,my+7,2,1,bd);
+    cx.globalAlpha=(.55+.35*Math.sin(t*9))*ap;
+    line(J.sx,J.sy,J.aF[0],J.aF[1],1,d.glow);line(J.sx,J.sy,J.aB[0],J.aB[1],1,d.glow);line(mx,my+5,J.hx,J.hy,1,d.glow);
+    cx.globalAlpha=.92*ap;
+    if(vr===1){line(J.sx+f*1,J.sy-3,J.sx+f*5,J.sy-12,4,'#0d0718');line(J.sx+f*1,J.sy-3,J.sx+f*5,J.sy-11,2,d.acc);line(J.sx-f*5,J.sy-3,J.sx-f*10,J.sy-11,4,'#0d0718');line(J.sx-f*5,J.sy-3,J.sx-f*10,J.sy-10,2,d.acc)}
+    if(vr===2){ring(mx,my+2,9,'#0d0718',3);ring(mx,my+2,9,d.glow,1)}
+    if(vr===3){line(J.hx-f*6,J.hy,J.hx+f*6,J.hy,3,'#0d0718');for(let i=-1;i<=1;i++)rect(J.hx+i*4-1,J.hy-2,2,5,d.acc)}
+  }
   const hx=J.hd[0],hy=J.hd[1];
   rect(hx-6,hy-6,12,12,'#0d0718');rect(hx-5,hy-5,10,10,d.skin);
   fr(hx,hy,f,-1,-2,7,3,'#0d0718');fr(hx,hy,f,0,-2,6,2,d.glow);               // visière
+  fr(hx,hy,f,1,-4,6,1,'#0d0718');fr(hx,hy,f,3,-3,3,1,'#ffffff');fr(hx,hy,f,-4,3,9,2,'#0d0718');
+  for(let i=0;i<4;i++)rect(hx+f*(-3+i*2)-(f<0?1:0),hy+3,1,2,d.acc);          // grille de bouche
   if(d.crest==='horn'){line(hx-3,hy-6,hx-5,hy-13,3,'#0d0718');line(hx+3,hy-6,hx+5,hy-13,3,'#0d0718');line(hx-3,hy-6,hx-5,hy-12,1,d.acc);line(hx+3,hy-6,hx+5,hy-12,1,d.acc)}
   else if(d.crest==='thorn'){line(hx-f*2,hy-6,hx-f*7,hy-14,4,'#0d0718');line(hx-f*2,hy-6,hx-f*7,hy-13,2,d.acc);line(hx+f*2,hy-6,hx+f*2,hy-15,4,'#0d0718');line(hx+f*2,hy-6,hx+f*2,hy-14,2,d.acc)}
   else if(d.crest==='halo'){ring(hx,hy-12,7,'#0d0718',4);ring(hx,hy-12,7,d.acc,2)}
@@ -527,7 +555,11 @@ function stand(a,alpha){
   else{rect(hx-4,hy-9,8,4,'#0d0718');rect(hx-3,hy-8,6,2,d.acc)}               // diadème
   limb(J.hx,J.hy,J.lF[0],J.lF[1],5,body,f);limb(J.lF[0],J.lF[1],J.lF[2],J.lF[3],4,body,f);
   limb(J.sx,J.sy,J.aF[0],J.aF[1],th,body,f);limb(J.aF[0],J.aF[1],J.aF[2],J.aF[3],th-1,d.skin,f);
-  rect(J.aF[2]-3,J.aF[3]-3,6,6,'#0d0718');rect(J.aF[2]-2,J.aF[3]-2,4,4,d.acc);
+  rect(J.aF[2]-4,J.aF[3]-4,8,8,'#0d0718');rect(J.aF[2]-3,J.aF[3]-3,6,6,d.acc);rect(J.aF[2]-3,J.aF[3]-3,6,2,lt(d.acc,.3));
+  for(let i=-1;i<=1;i++)rect(J.aF[2]+f*4,J.aF[3]+i*2-1,2,2,'#ffffff');             // pointes de poing
+  {const ex=(J.aF[0]+J.aF[2])/2,ey=(J.aF[1]+J.aF[3])/2;
+   line(ex-3,ey-3,ex+3,ey+3,3,'#0d0718');line(ex-3,ey-3,ex+3,ey+3,1,d.glow);
+   if(vr===0||vr===3){for(let i=0;i<2;i++)line(ex-4+i*3,ey-2,ex-4+i*3,ey+3,2,d.acc)}}
   if(a.sMode==='rush'){ // poings fantômes
     cx.globalAlpha=.55*ap;
     for(let i=0;i<5;i++){const o=(i*9+(t*260)%9),yy=J.aF[3]+Math.sin(t*50+i*2)*10;
@@ -538,7 +570,16 @@ function stand(a,alpha){
     for(let i=1;i<4;i++){rect(fx-f*i*7-2,fy-2,5,5,d.glow)}
     disc(fx,fy,7,d.glow);cx.globalAlpha=.9*ap;disc(fx,fy,3,'#fff');
   }
+  // étincelles d'énergie et onomatopée
+  for(let i=0;i<7;i++){
+    const ph=(t*24+i*13)%46,sx2=J.hx+Math.sin(t*2.3+i*1.7)*(14+i*1.5),sy2=J.hy+6-ph;
+    cx.globalAlpha=Math.max(0,1-ph/46)*.9*ap;rect(sx2,sy2,2,2,i%2?d.glow:'#ffffff');
+  }
   cx.globalAlpha=1;
+  if(alpha==null&&ap>.7&&(a.sMode==='rush'||a.sMode==='pose'||a.standLock||a.sMode==='punch')){
+    const sh=Math.floor(t*14)%2;
+    txt('ゴ',J.hx-f*10+sh,J.hy-44,12,d.glow,'center','#0d0718');txt('ゴ',J.hx+f*10-sh,J.hy-40,10,d.acc,'center','#0d0718');
+  }
   a.sFist=[J.aF[2],J.aF[3]];
 }
 /* ===== 4 : sons (WebAudio synthétisé) ===== */
