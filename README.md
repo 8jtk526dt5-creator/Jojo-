@@ -16,7 +16,7 @@ Sur l'écran de sélection, choisis FACILE, NORMAL ou DIFFICILE : cela change la
 | --- | --- | --- |
 | Bouger | ◀ ▶ | Flèches ou A / D |
 | Sauter | SAUT | Haut, W ou Espace |
-| Attaque normale (appuie plusieurs fois pour enchaîner jab, crochet, coup de pied) | COUP | J |
+| Attaque normale (appuie plusieurs fois pour enchaîner jab, crochet, coup de pied). Avec le Stand activé, c'est le Stand qui frappe, avec une portée plus longue | COUP | J |
 | Rafale du Stand (coûte de la jauge bleue, qui se recharge) | RAFALE | K |
 | Attaque spéciale propre au combattant (temps de recharge) | SPÉCIAL | I |
 | Garde (tenir appuyé, réduit fortement les dégâts de face) | GARDE | S ou Maj |
