@@ -6,6 +6,10 @@ Jeu de combat en pixel art, en un seul fichier HTML, sans dépendance. Garde, es
 
 Ouvre `index.html` dans un navigateur (iPhone, Android ou ordinateur). Avec GitHub Pages, le jeu est jouable directement depuis le lien du dépôt. Sur iPhone, le jeu se joue aussi en horizontal.
 
+## Difficulté et vitesse
+
+Sur l'écran de sélection, choisis FACILE, NORMAL ou DIFFICILE : cela change la vie, les dégâts, l'agressivité, la garde et l'usage des pouvoirs de l'adversaire. Le jeu tourne à 80 % de sa vitesse d'origine, et l'arène s'adapte à la hauteur de l'écran pour que tous les boutons restent visibles.
+
 ## Commandes
 
 | Action | Tactile | Clavier |
