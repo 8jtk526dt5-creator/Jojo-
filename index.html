@@ -105,6 +105,11 @@ body.menu #pad{display:none}
   #stage{max-width:none}
   @supports (height:100dvh){:root{--u:clamp(32px,11dvh,50px)}}
 }
+#tabs{display:flex;gap:5px;flex:none}
+#tabs button{flex:1;font-family:var(--display);font-size:12px;letter-spacing:.5px;color:var(--paper);background:var(--violet);border:2px solid #6a4aa0;border-radius:8px;padding:5px 2px;min-width:0;white-space:nowrap}
+#tabs button.on{background:var(--gold);color:var(--ink);border-color:var(--paper)}
+.cell.foe{border-color:var(--cyan);background:#16466b}
+.cell.on.foe{border-color:var(--gold)}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:wght@400;700&display=swap">
 <div id="stage">
@@ -119,6 +124,7 @@ body.menu #pad{display:none}
 </div>
 <div id="select">
   <div id="info"><div id="infoName"></div><div id="infoStand"></div><div id="infoPow"></div></div>
+  <div id="tabs"><button data-t="0" class="on">MOI</button><button data-t="1">ADVERSAIRE</button><button data-t="2">ALÉATOIRE</button></div>
   <div id="grid"></div>
   <div id="diff"><button data-d="0">FACILE</button><button data-d="1" class="on">NORMAL</button><button data-d="2">DIFFICILE</button></div>
   <button class="btn" id="go">COMBATTRE</button>
@@ -668,7 +674,7 @@ function mk(d,isFoe){
   const hp=Math.round(100*HPS*d.hpm*(isFoe?(1+G.round*.18)*D().hp:1));
   return{d,isFoe,x:isFoe?292:92,y:GROUND,vx:0,vy:0,f:isFoe?-1:1,hp,max:hp,trail:hp,
     st:'idle',stT:0,stDur:0,atk:null,dealt:false,queued:false,
-    t:Math.random()*5,standOn:false,standT:0,sMode:'idle',sOff:-20,gauge:100,ult:0,frozen:0,boost:0,fzHits:0,
+    t:Math.random()*5,jumps:0,standOn:false,standT:0,sMode:'idle',sOff:-20,gauge:100,ult:0,frozen:0,boost:0,fzHits:0,
     dashCd:0,inv:0,guarding:false,air:false,rushHit:0,rushN:0,rushFin:false,
     slow:0,haste:0,poison:0,poisonBy:null,dps:3,counter:0,cMult:.9,regen:0,hist:[],histT:0,shieldT:0,fzCol:'#78c8ff',fzType:'time',
     specCd:2,standHold:0,cd:1.2,ac:.8,aiT:0,aiAct:'',shoot:2,comboN:0,comboT:0,fist:[0,0],head:[0,0],sFist:[0,0],ghostT:0};
@@ -774,7 +780,7 @@ function phys(a,dt){
   a.vy+=640*dt;a.y+=a.vy*dt;
   if(a.y>=GROUND){
     if(was&&a.vy>80){sfx.land();dust(a.x,GROUND,7)}
-    a.y=GROUND;a.vy=0;a.air=false;
+    a.y=GROUND;a.vy=0;a.air=false;a.jumps=0;
   }else a.air=true;
   a.x+=a.vx*dt;
   const free=a.st==='idle'||a.st==='walk'||a.st==='block'||a.st==='jump';
@@ -824,18 +830,22 @@ function updPlayer(a,o,dt){
     a.f=o.x>a.x?1:-1;
     if(inp.guard&&!air){a.guarding=true;a.st='block';a.vx*=.6}
     else{
-      const sp=108*a.d.spd*(a.boost>0?1.25:1);
-      a.vx=lerp(a.vx,mv*sp,Math.min(1,dt*14));
+      const sp=134*a.d.spd*(a.boost>0?1.25:1);
+      a.vx=lerp(a.vx,mv*sp,Math.min(1,dt*(air?16:22)));
       a.st=air?'jump':(Math.abs(mv)?'walk':'idle');
     }
-    if(inp.jump&&!air){a.vy=-285;sfx.jump();dust(a.x,GROUND,4)}
+    if(inp.jump&&!air){a.vy=-310;sfx.jump();dust(a.x,GROUND,4)}
+    else if(inp.jump&&air&&a.jumps<1){a.jumps++;a.vy=-275;a.vx+=mv*60;sfx.jump();spark(a.x,a.y-4,'#ffffff',8);G.rings.push({x:a.x,y:a.y-2,r:4,t:.25,max:.25,col:a.d.st.glow})}
     if(inp.dash&&a.dashCd<=0){
-      const dir=mv||-a.f;setSt(a,'dash',.26);a.vx=dir*320;a.inv=.24;a.dashCd=.5;ghost(a);sfx.dash();dust(a.x,GROUND,5);
+      const dir=mv||-a.f;setSt(a,'dash',.22);a.vx=dir*390;a.inv=.22;a.dashCd=.32;ghost(a);sfx.dash();dust(a.x,GROUND,5);
     }else if(inp.hit&&!a.guarding)startAtk(a,0);
     else if(inp.rush&&!a.guarding&&a.gauge>=25)startRush(a);
     else if(inp.spec&&!a.guarding&&a.specCd<=0)useSpec(a,o);
     if(inp.ult&&a.ult>=100)castUlt(a);
   }else if(a.st==='atk'&&inp.hit&&a.atk&&a.atk.id<2&&a.stT>a.atk.w)a.queued=true;
+  if(a.st==='atk'&&a.atk&&a.atk.id<9&&inp.dash&&a.dashCd<=0&&a.stT>=a.atk.w+a.atk.a){   // annulation de coup par une esquive
+    const dir=mv||-a.f;a.atk=null;a.queued=false;setSt(a,'dash',.22);a.vx=dir*390;a.inv=.22;a.dashCd=.32;ghost(a);sfx.dash();dust(a.x,GROUND,5);
+  }
   inp.jump=inp.hit=inp.rush=inp.spec=inp.dash=inp.ult=inp.stand=false;
 }
 function castUlt(a){
@@ -1573,7 +1583,8 @@ function newGame(){
   me=mk(ROSTER[G.picked],false);G.round=0;
   const ids=ROSTER.map((_,i)=>i).filter(i=>i!==G.picked);
   for(let i=ids.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[ids[i],ids[j]]=[ids[j],ids[i]]}
-  G.opps=ids.slice(0,ROUNDS).map(i=>ROSTER[i]);
+  G.opps=ids.filter(i=>i!==G.foePick).slice(0,ROUNDS).map(i=>ROSTER[i]);
+  if(G.foePick!=null){G.opps=[ROSTER[G.foePick],...G.opps.slice(0,ROUNDS-1)]}
   startRound();
 }
 function endScreen(win){
@@ -1596,7 +1607,7 @@ function toMenu(){
   $('end').hidden=true;
 }
 function previewFighters(){
-  me=mk(ROSTER[G.picked],false);foe=mk(ROSTER[(G.picked+7)%ROSTER.length],true);
+  me=mk(ROSTER[G.picked],false);foe=mk(ROSTER[G.foePick!=null?G.foePick:(G.picked+7)%ROSTER.length],true);
   me.x=112;foe.x=272;me.standOn=true;foe.standOn=true;me.standT=1;foe.standT=1;
 }
 
@@ -1703,10 +1714,26 @@ function showInfo(d){
   $('infoStand').textContent='Stand : '+d.stand+'  ·  Ultime : '+d.ultName;
   $('infoPow').textContent=d.desc+' Spécial : '+d.sp.n+' ('+SPEC_DESC[d.sp.k]+').';
 }
-function pickFighter(i){
-  G.picked=i;[...grid.children].forEach((c,k)=>c.classList.toggle('on',k===i));
-  previewFighters();showInfo(ROSTER[i]);
+G.foePick=null;G.tab=0;
+const tabs=[...document.querySelectorAll('#tabs button')];
+function refreshGrid(){
+  [...grid.children].forEach((c,k)=>{c.classList.toggle('on',k===G.picked);c.classList.toggle('foe',k===G.foePick)});
+  tabs.forEach((b,k)=>b.classList.toggle('on',k===G.tab));
+  $('tabs').querySelector('[data-t="2"]').classList.toggle('on',G.foePick==null&&G.tab===1);
 }
+function pickFighter(i){
+  if(G.tab===1){
+    if(i===G.picked)return;
+    G.foePick=i;previewFighters();showInfo(ROSTER[i]);refreshGrid();return;
+  }
+  G.picked=i;if(G.foePick===i)G.foePick=null;
+  previewFighters();showInfo(ROSTER[i]);refreshGrid();
+}
+tabs.forEach(b=>b.addEventListener('click',()=>{
+  const t=+b.dataset.t;
+  if(t===2){G.foePick=null;G.tab=1;previewFighters()}else G.tab=t;
+  refreshGrid();
+}));
 ROSTER.forEach((d,i)=>{
   const b=document.createElement('button');b.className='cell';b.setAttribute('aria-label',d.name);
   const c=document.createElement('canvas');c.width=24;c.height=24;drawIcon(c,d);
@@ -1715,7 +1742,7 @@ ROSTER.forEach((d,i)=>{
   b.addEventListener('click',()=>pickFighter(i));
   grid.appendChild(b);
 });
-grid.children[0].classList.add('on');showInfo(ROSTER[0]);
+refreshGrid();showInfo(ROSTER[0]);
 const dBtns=[...document.querySelectorAll('#diff button')];
 function setDiff(i){G.diff=i;dBtns.forEach((b,k)=>b.classList.toggle('on',k===i));try{localStorage.setItem('jojo-diff',String(i))}catch(e){}}
 dBtns.forEach((b,k)=>b.addEventListener('click',()=>setDiff(k)));

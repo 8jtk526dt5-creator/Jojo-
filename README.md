@@ -10,6 +10,10 @@ Ouvre `index.html` dans un navigateur (iPhone, Android ou ordinateur). Avec GitH
 
 Sur l'écran de sélection, choisis FACILE, NORMAL ou DIFFICILE : cela change la vie, les dégâts, l'agressivité, la garde et l'usage des pouvoirs de l'adversaire. Le jeu tourne à 80 % de sa vitesse d'origine, et l'arène s'adapte à la hauteur de l'écran pour que tous les boutons restent visibles.
 
+## Mobilité et choix de l'adversaire
+
+Déplacement plus rapide, saut plus haut, **double saut** (appuie une seconde fois sur SAUT en l'air) et esquive plus courte. Après un coup, l'esquive peut annuler la fin de l'animation. Sur l'écran de sélection, l'onglet ADVERSAIRE te laisse choisir qui tu affrontes en premier ; ALÉATOIRE rétablit le tirage au sort. Les deux manches suivantes restent aléatoires.
+
 ## Commandes
 
 | Action | Tactile | Clavier |
