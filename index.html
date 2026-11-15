@@ -85,26 +85,26 @@ body.menu #pad{display:none}
 #diff button{flex:1;font-family:var(--display);font-size:15px;letter-spacing:1px;color:var(--paper);background:var(--violet);border:2px solid #6a4aa0;border-radius:8px;padding:6px 4px;min-width:0}
 #diff button.on{background:var(--gold);color:var(--ink);border-color:var(--paper)}
 /* taille de l'arène et des boutons selon la hauteur visible */
-:root{--u:clamp(34px,min(14vw,9vh),56px);--padh:calc(var(--u)*2.7 + 30px)}
+:root{--u:clamp(40px,min(16vw,10.5vh),90px);--padh:calc(var(--u)*2.7 + 30px)}
 #stage{max-width:min(100%,calc((100vh - var(--padh) - 14px)*1.7778))}
 #pad{flex:none;gap:8px;padding-top:2px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
 #dirs{grid-template-columns:repeat(2,calc(var(--u)*1.1))}
 #dirs .k{height:calc(var(--u)*1.2);font-size:calc(var(--u)*.5)}
 #acts{grid-template-columns:repeat(3,calc(var(--u)*1.08));gap:6px}
-.k{height:var(--u);font-size:clamp(9px,calc(var(--u)*.22),12px)}
+.k{height:var(--u);font-size:clamp(9px,calc(var(--u)*.22),17px)}
 #ultk{height:calc(var(--u)*.72);grid-column:1 / span 2;border-radius:30px}
 #standk{height:calc(var(--u)*.72);border-radius:30px;background:var(--violet)}
 #standk.on{background:var(--gold);color:var(--ink)}
 @supports (height:100dvh){
-  :root{--u:clamp(34px,min(14vw,9dvh),56px)}
+  :root{--u:clamp(40px,min(16vw,10.5dvh),90px)}
   body{height:100dvh}
   #stage{max-width:min(100%,calc((100dvh - var(--padh) - 14px)*1.7778))}
 }
 @media (orientation:landscape){
-  :root{--u:clamp(40px,12vh,76px)}
+  :root{--u:clamp(48px,13.5vh,90px)}
   #stage{max-width:none;width:min(100vw,calc(100vh*1.7778))}
   #snd{right:auto;left:50%;transform:translateX(-50%);bottom:8px}
-  @supports (height:100dvh){:root{--u:clamp(40px,12dvh,76px)}#stage{width:min(100vw,calc(100dvh*1.7778))}}
+  @supports (height:100dvh){:root{--u:clamp(48px,13.5dvh,90px)}#stage{width:min(100vw,calc(100dvh*1.7778))}}
 }
 #tabs{display:flex;gap:5px;flex:none}
 #tabs button{flex:1;font-family:var(--display);font-size:12px;letter-spacing:.5px;color:var(--paper);background:var(--violet);border:2px solid #6a4aa0;border-radius:8px;padding:5px 2px;min-width:0;white-space:nowrap}
