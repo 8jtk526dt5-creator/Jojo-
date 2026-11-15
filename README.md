@@ -22,6 +22,7 @@ Sur l'écran de sélection, choisis FACILE, NORMAL ou DIFFICILE : cela change la
 | Garde (tenir appuyé, réduit fortement les dégâts de face) | GARDE | S ou Maj |
 | Esquive (courte invincibilité) | ESQUIVE | U ou E |
 | Ultime (barre orange pleine) | ULTIME | L |
+| Activer / désactiver le Stand (Stand sorti en permanence : dégâts +30 %, mais la jauge bleue se vide doucement) | STAND | Q ou O |
 
 ## Combattants
 
