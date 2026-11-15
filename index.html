@@ -110,6 +110,16 @@ body.menu #pad{display:none}
 #tabs button.on{background:var(--gold);color:var(--ink);border-color:var(--paper)}
 .cell.foe{border-color:var(--cyan);background:#16466b}
 .cell.on.foe{border-color:var(--gold)}
+/* écran de sélection : tout reste accessible sur les petits écrans */
+body.menu #stage{max-width:min(100%,calc(30vh*1.7778))}
+@supports (height:100dvh){body.menu #stage{max-width:min(100%,calc(30dvh*1.7778))}}
+#info{min-height:0;padding:4px 8px}
+#infoName{font-size:18px}
+#infoPow{font-size:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#grid{flex:1 1 auto;min-height:96px}
+#select{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#go{flex:none}
+@media (max-height:480px) and (orientation:portrait){body.menu #stage{max-width:min(100%,calc(22vh*1.7778))}#infoStand{display:none}}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:wght@400;700&display=swap">
 <div id="stage">
