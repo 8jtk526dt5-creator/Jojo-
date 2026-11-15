@@ -14,6 +14,10 @@ Sur l'écran de sélection, choisis FACILE, NORMAL ou DIFFICILE : cela change la
 
 Déplacement plus rapide, saut plus haut, **double saut** (appuie une seconde fois sur SAUT en l'air) et esquive plus courte. Après un coup, l'esquive peut annuler la fin de l'animation. Sur l'écran de sélection, l'onglet ADVERSAIRE te laisse choisir qui tu affrontes en premier ; ALÉATOIRE rétablit le tirage au sort. Les deux manches suivantes restent aléatoires.
 
+## Arène
+
+L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le décor défile quand vous vous déplacez.
+
 ## Commandes
 
 | Action | Tactile | Clavier |
