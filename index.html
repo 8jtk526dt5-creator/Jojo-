@@ -518,68 +518,220 @@ function standPose(a){
   if(m==='hurt')return mkP(-.2,-.2,[-.4,-.1],[.0,.5],[.2,.4],[.4,.2]);
   return mkP(.1+fl*.03,0,[.8,2.2+fl*.1],[1.0,2.3-fl*.1],[-.3,-.1],[.35,.1]);
 }
+/* ===== Chaque Stand a sa propre silhouette : proportions, tête, torse, mains, accessoires ===== */
+const SF={
+ 'TIC-TAC':{sc:1.2,bw:13,th:6,head:'clock',chest:'core',hand:'gaunt',feat:['gears','scarf']},
+ 'ROSE NOIRE':{sc:1.15,bw:10,th:4,head:'mask',chest:'star',hand:'claw',feat:['spikes','petals']},
+ 'HORLOGE VIDE':{sc:1.25,bw:11,th:5,head:'hood',chest:'core',hand:'bare',feat:['cloak','orbs'],legs:'robe'},
+ 'SABLIER':{sc:1.2,bw:12,th:5,head:'mask',chest:'glass',hand:'bare',feat:['sandfall','scarf']},
+ 'SUTURE':{sc:1.2,bw:12,th:5,head:'round',chest:'cross',hand:'claw',feat:['bandage','chains']},
+ 'GRANITE':{sc:1.5,bw:19,th:9,head:'cyclops',chest:'none',hand:'ball',feat:['crystals']},
+ 'ÉCLIPSE':{sc:1.2,bw:9,th:4,head:'eclipse',chest:'none',hand:'claw',feat:['cloak','wings'],legs:'robe'},
+ 'FOUDRE MÈRE':{sc:1.25,bw:13,th:6,head:'helm',chest:'core',hand:'gaunt',feat:['lightning','rings']},
+ 'CYCLONE':{sc:1.15,bw:9,th:4,head:'visor',chest:'none',hand:'bare',feat:['wings','scarf'],legs:'tail'},
+ 'HAUT-FOURNEAU':{sc:1.4,bw:17,th:8,head:'helm',chest:'core',hand:'ball',feat:['flames','gears']},
+ 'HIVER ÉTERNEL':{sc:1.2,bw:11,th:5,head:'mask',chest:'star',hand:'claw',feat:['crystals','cloak']},
+ 'ÉTINCELLE':{sc:1.1,bw:9,th:4,head:'round',chest:'core',hand:'bare',feat:['lightning','orbs']},
+ "VENIN D'ORCHIDÉE":{sc:1.15,bw:10,th:4,head:'mask',chest:'star',hand:'claw',feat:['petals','drips']},
+ 'SOIF ROUGE':{sc:1.25,bw:12,th:6,head:'beast',chest:'cross',hand:'claw',feat:['drips','cloak']},
+ 'MARÉE NOIRE':{sc:1.25,bw:12,th:5,head:'round',chest:'glass',hand:'bare',feat:['tentacles','drips'],legs:'tail'},
+ 'POIDS MORT':{sc:1.5,bw:20,th:9,head:'round',chest:'none',hand:'ball',feat:['chains','rings']},
+ 'MIROIR BRISÉ':{sc:1.2,bw:11,th:5,head:'mask',chest:'glass',hand:'gaunt',feat:['crystals','orbs']},
+ 'VITESSE LIMITE':{sc:1.1,bw:9,th:4,head:'helm',chest:'core',hand:'gaunt',feat:['wings','gears']},
+ 'MURAILLE':{sc:1.5,bw:21,th:9,head:'helm',chest:'none',hand:'ball',feat:['crystals','spikes']},
+ 'ÉTOILE FILANTE':{sc:1.2,bw:10,th:5,head:'sun',chest:'star',hand:'bare',feat:['orbs','scarf']},
+ 'SQUELETTE ROI':{sc:1.25,bw:11,th:5,head:'skull',chest:'ribs',hand:'claw',feat:['cloak','bandage']},
+ 'AIMANT':{sc:1.3,bw:14,th:7,head:'helm',chest:'core',hand:'ball',feat:['rings','orbs']},
+ 'LAME DU VENT':{sc:1.15,bw:8,th:3,head:'mask',chest:'none',hand:'claw',feat:['wings','scarf']},
+ 'SIX COUPS':{sc:1.2,bw:11,th:5,head:'hood',chest:'cross',hand:'gaunt',feat:['orbs','chains']},
+ 'COBRA ROYAL':{sc:1.2,bw:11,th:5,head:'beast',chest:'star',hand:'claw',feat:['wings','spikes'],legs:'tail'},
+ 'DÉSERT VIVANT':{sc:1.3,bw:14,th:6,head:'mask',chest:'none',hand:'bare',feat:['sandfall','cloak'],legs:'robe'},
+ 'SOLEIL FINAL':{sc:1.3,bw:13,th:6,head:'sun',chest:'core',hand:'gaunt',feat:['rings','flames']},
+ 'RÉVERBÉRATION':{sc:1.2,bw:10,th:5,head:'round',chest:'glass',hand:'bare',feat:['rings','scarf']},
+ 'GLITCH':{sc:1.15,bw:9,th:4,head:'glitch',chest:'none',hand:'bare',feat:['lightning','chains']},
+ 'TITAN':{sc:1.55,bw:22,th:10,head:'helm',chest:'core',hand:'ball',feat:['crystals','flames']}
+};
+const SF_DEF={sc:1.2,bw:13,th:6,head:'visor',chest:'gem',hand:'gaunt',feat:['scarf']};
+const INK='#0d0718';
+function drawFeat(n,J,f,t,d,ap,front,vol){
+  const sway=Math.sin(t*3);
+  if(!front){
+    if(n==='scarf'){
+      for(let i=0;i<8;i++){const rx=J.sx-f*(3+i*5.5),ry=J.sy-3+Math.sin(t*7+i*.8)*(2+i*.5)+i*.9,w=Math.max(1,5-i*.55);
+        if(i<7){const nx=J.sx-f*(3+(i+1)*5.5),ny=J.sy-3+Math.sin(t*7+(i+1)*.8)*(2+(i+1)*.5)+(i+1)*.9;
+          line(rx,ry,nx,ny,w+2,INK);line(rx,ry,nx,ny,w,i%2?d.glow:d.acc)}}
+    }else if(n==='wings'||n==='petals'){
+      const pet=n==='petals';
+      for(let s=0;s<2;s++)for(let i=0;i<5;i++){
+        const ang=(pet?-.2:-1.15)+i*(pet?.5:.45)+Math.sin(t*4+i)*.06,L=(pet?18:30)-i*(pet?1:3.2),ox=J.sx-f*4,oy=J.sy-1;
+        const ex=ox-f*Math.cos(ang)*L*(s?.8:1),ey=oy-Math.sin(ang)*L*(s?.8:1)+(s?4:0);
+        cx.globalAlpha=(s?.55:.85)*ap;line(ox,oy,ex,ey,pet?5:3,INK);line(ox,oy,ex,ey,pet?3:1.5,i%2?d.glow:d.acc);
+      }
+      cx.globalAlpha=.92*ap;
+    }else if(n==='tail'){
+    }else if(n==='cloak'){
+      cx.fillStyle=dk(d.body,.5);cx.beginPath();
+      cx.moveTo(J.sx-f*8,J.sy-2);cx.lineTo(J.sx+f*5,J.sy-2);cx.lineTo(J.hx+f*14+sway*2,J.hy+36);cx.lineTo(J.hx-f*20+sway*3,J.hy+37);cx.closePath();cx.fill();
+      for(let i=0;i<4;i++)line(J.sx-f*(6-i*3),J.sy+4,J.hx-f*(16-i*9)+sway*2,J.hy+34,1,dk(d.body,.7));
+      line(J.hx-f*20+sway*3,J.hy+37,J.hx+f*14+sway*2,J.hy+36,2,d.glow);
+    }else if(n==='spikes'){
+      for(let i=0;i<5;i++){const px=lerp(J.sx,J.hx,i/4.2)-f*8,py=lerp(J.sy,J.hy,i/4.2),L=10-i;
+        line(px,py,px-f*L,py-L*.7,4,INK);line(px,py,px-f*L,py-L*.7,2,d.acc)}
+    }else if(n==='flames'){
+      for(let i=0;i<7;i++){const bx=J.sx-f*(10-i*3),by=J.sy-4,h=14+Math.sin(t*9+i*2)*6;
+        cx.globalAlpha=.75*ap;line(bx,by,bx+Math.sin(t*6+i)*3,by-h,5,d.glow);cx.globalAlpha=.9*ap;line(bx,by,bx+Math.sin(t*6+i)*2,by-h*.6,2,'#fff')}
+      cx.globalAlpha=.92*ap;
+    }else if(n==='gears'){
+      [[J.sx-f*11,J.sy-6,8,1],[J.hx-f*13,J.hy+3,6,-1.4]].forEach(g=>{
+        ring(g[0],g[1],g[2],INK,3);ring(g[0],g[1],g[2],d.acc,1);
+        for(let i=0;i<8;i++){const a2=i*Math.PI/4+t*g[3];line(g[0]+Math.cos(a2)*g[2],g[1]+Math.sin(a2)*g[2],g[0]+Math.cos(a2)*(g[2]+3),g[1]+Math.sin(a2)*(g[2]+3),2,d.acc)}});
+    }else if(n==='tentacles'){
+      for(let k=0;k<4;k++){let px=J.sx-f*4,py=J.sy+k*3;
+        for(let i=0;i<7;i++){const nx=px-f*5,ny=py+Math.sin(t*5+i*.8+k)*4+(k-1.5)*1.2;line(px,py,nx,ny,Math.max(1,5-i*.6)+2,INK);line(px,py,nx,ny,Math.max(1,5-i*.6),k%2?d.glow:d.acc);px=nx;py=ny}}
+    }else if(n==='crystals'){
+      [[J.sx-f*7,J.sy-4],[J.sx+f*7,J.sy-4]].forEach((c,i)=>{const h=11+i*3;
+        line(c[0],c[1],c[0],c[1]-h,6,INK);line(c[0],c[1],c[0],c[1]-h+1,3,i?d.glow:lt(d.acc,.2));line(c[0]-1,c[1]-h+2,c[0]-1,c[1]-3,1,'#fff')});
+    }
+  }else{
+    if(n==='orbs'){for(let i=0;i<3;i++){const an=t*2.2+i*2.094,ox=J.hx+Math.cos(an)*24,oy=(J.hy+J.sy)/2+Math.sin(an)*9;
+        disc(ox,oy,5,INK);disc(ox,oy,4,d.glow);disc(ox-1,oy-1,2,'#fff')}}
+    else if(n==='rings'){for(let i=0;i<2;i++){const yy=(J.hy+J.sy)/2+i*8-4,w=20+i*4,ph=t*(i?-3:3);
+        cx.globalAlpha=.8*ap;for(let k=0;k<14;k++){const a1=ph+k*.45,a2=a1+.25;line(J.hx+Math.cos(a1)*w,yy+Math.sin(a1)*4,J.hx+Math.cos(a2)*w,yy+Math.sin(a2)*4,2,k%2?d.glow:d.acc)}
+        cx.globalAlpha=.92*ap}}
+    else if(n==='chains'){[J.aF,J.aB].forEach((a,s)=>{let px=a[2],py=a[3];for(let i=0;i<6;i++){const nx=px-f*2+Math.sin(t*5+i+s)*2,ny=py+4;rect(nx-1,ny-1,3,3,i%2?'#cfd6e8':'#7f88a8');px=nx;py=ny}})}
+    else if(n==='lightning'){cx.globalAlpha=.95*ap;for(let k=0;k<3;k++){let px=J.hx+(k-1)*10,py=J.hy-26+k*3;
+        for(let i=0;i<5;i++){const nx=px+(Math.random()-.5)*10,ny=py+9;line(px,py,nx,ny,2,i%2?'#fff':d.glow);px=nx;py=ny}}cx.globalAlpha=.92*ap}
+    else if(n==='drips'||n==='sandfall'){const col=n==='sandfall'?'#e8c987':d.glow;[J.aF,J.aB,J.lF].forEach((a,s)=>{for(let i=0;i<3;i++){const ph=(t*30+i*14+s*7)%34;
+        cx.globalAlpha=Math.max(0,1-ph/34)*.9*ap;rect(a[2]+Math.sin(i+s)*3,a[3]+ph,2,n==='sandfall'?2:3,col)}});cx.globalAlpha=.92*ap}
+    else if(n==='bandage'){[J.aF,J.aB].forEach(a=>{for(let i=0;i<3;i++){const px=lerp(a[0],a[2],.35+i*.2),py=lerp(a[1],a[3],.35+i*.2);line(px-3,py-2,px+3,py+2,2,'#f2eadb')}})}
+  }
+}
+function drawHead(type,hx,hy,f,d,t,body){
+  const dark=INK;
+  if(type==='skull'){
+    rect(hx-6,hy-7,12,13,dark);rect(hx-5,hy-6,10,10,'#ebe6d2');rect(hx-3,hy+4,6,3,'#ebe6d2');
+    fr(hx,hy,f,-1,-3,3,3,dark);fr(hx,hy,f,3,-3,3,3,dark);fr(hx,hy,f,0,-2,1,1,d.glow);fr(hx,hy,f,4,-2,1,1,d.glow);fr(hx,hy,f,2,1,2,2,dark);
+    for(let i=0;i<4;i++)rect(hx-3+i*2,hy+5,1,2,dark);
+  }else if(type==='cyclops'){
+    rect(hx-7,hy-7,14,14,dark);rect(hx-6,hy-6,12,12,d.skin);rect(hx-6,hy-6,12,3,lt(d.skin,.2));
+    disc(hx+f*2,hy-1,5,dark);disc(hx+f*2,hy-1,4,'#f6ecff');disc(hx+f*3,hy-1,2,d.glow);rect(hx+f*3-1,hy-2,1,1,'#fff');
+    fr(hx,hy,f,-4,4,9,2,dark);
+  }else if(type==='mask'){
+    rect(hx-6,hy-6,12,12,dark);rect(hx-5,hy-5,10,10,d.skin);
+    line(hx-f*1,hy-2,hx+f*4,hy-3,2,dark);line(hx-f*1,hy-2,hx+f*3,hy-3,1,d.glow);line(hx-f*4,hy-1,hx-f*1,hy-2,2,dark);
+    rect(hx-1,hy-5,3,2,d.acc);rect(hx-1,hy+2,2,3,dark);
+  }else if(type==='hood'){
+    cx.fillStyle=dk(body,.55);cx.beginPath();cx.moveTo(hx-f*8,hy+7);cx.lineTo(hx-f*3,hy-11);cx.lineTo(hx+f*7,hy+7);cx.closePath();cx.fill();
+    rect(hx-5,hy-4,11,9,dark);rect(hx+f*1-1,hy-2,2,2,d.glow);rect(hx+f*4-1,hy-2,2,2,d.glow);
+  }else if(type==='helm'){
+    rect(hx-7,hy-7,14,14,dark);rect(hx-6,hy-6,12,12,lt(d.skin,.1));rect(hx-6,hy-6,12,3,lt(d.skin,.35));
+    rect(hx-5,hy-1,10,3,dark);rect(hx-1,hy-6,3,12,dark);rect(hx-4,hy,8,1,d.glow);
+    rect(hx-5,hy+4,10,2,dk(d.skin,.3));
+  }else if(type==='round'){
+    disc(hx,hy,7,dark);disc(hx,hy,6,d.skin);disc(hx-2,hy-3,2,lt(d.skin,.4));
+    disc(hx+f*2,hy-1,2.4,'#f6ecff');disc(hx-f*2,hy-1,2.4,'#f6ecff');rect(hx+f*2-1,hy-1,2,2,dark);rect(hx-f*2-1,hy-1,2,2,dark);
+    line(hx-3,hy+3,hx+3,hy+3,2,dark);
+  }else if(type==='beast'){
+    rect(hx-6,hy-6,12,11,dark);rect(hx-5,hy-5,10,9,d.skin);
+    rect(hx+f*5,hy-1,6,5,dark);rect(hx+f*5,hy,5,3,d.skin);rect(hx+f*10,hy,2,2,dark);
+    line(hx-f*3,hy-6,hx-f*5,hy-13,4,dark);line(hx-f*3,hy-6,hx-f*5,hy-12,2,d.acc);line(hx+f*1,hy-6,hx+f*1,hy-13,4,dark);line(hx+f*1,hy-6,hx+f*1,hy-12,2,d.acc);
+    rect(hx+f*1-1,hy-3,3,2,d.glow);rect(hx+f*6,hy+3,1,3,'#fff');rect(hx+f*8,hy+3,1,3,'#fff');
+  }else if(type==='clock'){
+    disc(hx,hy,8,dark);disc(hx,hy,7,'#f6ecff');ring(hx,hy,7,d.glow,1);
+    for(let i=0;i<12;i++){const a2=i*Math.PI/6;rect(hx+Math.cos(a2)*5.5-.5,hy+Math.sin(a2)*5.5-.5,1,1,dark)}
+    line(hx,hy,hx+Math.cos(t*2)*5,hy+Math.sin(t*2)*5,1,dark);line(hx,hy,hx+Math.cos(t*.4)*3,hy+Math.sin(t*.4)*3,2,d.body);
+  }else if(type==='sun'){
+    for(let i=0;i<12;i++){const a2=i*Math.PI/6+t*.8;line(hx+Math.cos(a2)*8,hy+Math.sin(a2)*8,hx+Math.cos(a2)*(13+(i%2)*3),hy+Math.sin(a2)*(13+(i%2)*3),2,d.glow)}
+    disc(hx,hy,8,dark);disc(hx,hy,7,d.acc);rect(hx-5,hy-2,10,3,dark);rect(hx-4,hy-1,8,1,d.glow);
+  }else if(type==='eclipse'){
+    disc(hx,hy,10,d.glow);cx.globalAlpha*=.5;disc(hx,hy,12,d.glow);cx.globalAlpha=Math.min(1,cx.globalAlpha*2);
+    disc(hx,hy,8,'#05020a');rect(hx+f*2-1,hy-1,3,2,'#fff');
+  }else if(type==='glitch'){
+    rect(hx-6,hy-6,12,12,dark);rect(hx-5,hy-5,10,10,d.skin);
+    for(let i=0;i<4;i++){const sh=Math.sin(t*20+i*3)>.4?(i%2?3:-3):0;rect(hx-5+sh,hy-5+i*3,10,2,i%2?d.glow:d.acc)}
+    rect(hx-3,hy-2,3,3,dark);rect(hx+2,hy-2,3,3,dark);rect(hx-2,hy-1,1,1,'#fff');rect(hx+3,hy-1,1,1,'#fff');
+    if(Math.sin(t*13)>.7)rect(hx-8,hy+1,16,1,'#fff');
+  }else{ // visière (défaut)
+    rect(hx-6,hy-6,12,12,dark);rect(hx-5,hy-5,10,10,d.skin);
+    fr(hx,hy,f,-1,-2,7,3,dark);fr(hx,hy,f,0,-2,6,2,d.glow);
+    fr(hx,hy,f,1,-4,6,1,dark);fr(hx,hy,f,3,-3,3,1,'#ffffff');fr(hx,hy,f,-4,3,9,2,dark);
+    for(let i=0;i<4;i++)rect(hx+f*(-3+i*2)-(f<0?1:0),hy+3,1,2,d.acc);
+  }
+}
+function drawChest(type,mx,my,f,t,d,bd,J){
+  if(type==='core'){disc(mx,my+2,6,INK);disc(mx,my+2,5,d.acc);disc(mx,my+2,3+Math.sin(t*6),d.glow);disc(mx,my+2,1.5,'#fff')}
+  else if(type==='ribs'){for(let i=0;i<4;i++){line(mx-5,my-2+i*3,mx+5,my-2+i*3,2,INK);line(mx-4,my-2+i*3,mx+4,my-2+i*3,1,'#ebe6d2')}line(mx,my-3,mx,my+9,2,'#ebe6d2')}
+  else if(type==='cross'){rect(mx-5,my,10,4,INK);rect(mx-1,my-4,3,12,INK);rect(mx-4,my+1,8,2,'#fff');rect(mx,my-3,1,10,'#fff');rect(mx-1,my+1,3,2,d.glow)}
+  else if(type==='star'){for(let i=0;i<5;i++){const a2=-Math.PI/2+i*Math.PI*.8;line(mx+Math.cos(a2)*6,my+2+Math.sin(a2)*6,mx+Math.cos(a2+Math.PI*.8)*6,my+2+Math.sin(a2+Math.PI*.8)*6,3,INK)}
+    for(let i=0;i<5;i++){const a2=-Math.PI/2+i*Math.PI*.8;line(mx+Math.cos(a2)*6,my+2+Math.sin(a2)*6,mx+Math.cos(a2+Math.PI*.8)*6,my+2+Math.sin(a2+Math.PI*.8)*6,1,d.glow)}}
+  else if(type==='glass'){rect(mx-5,my-3,10,12,INK);rect(mx-4,my-2,8,10,'#1b2a4a');cx.globalAlpha*=.8;rect(mx-3,my+3+Math.sin(t*3),6,4,d.glow);cx.globalAlpha=Math.min(1,cx.globalAlpha/.8);rect(mx-4,my-2,2,10,'rgba(255,255,255,.35)')}
+  else if(type==='none'){for(let i=0;i<3;i++)rect(mx-4+i*3,my+3,2,1,bd)}
+  else{ // gemme
+    rect(mx-3,my-1,6,6,INK);rect(mx-2,my,4,4,d.acc);rect(mx-1,my+1,2,2,Math.floor(t*4)%2?'#ffffff':d.glow);
+  }
+}
+function drawHand(type,J,f,d,body){
+  const hx=J.aF[2],hy=J.aF[3];
+  if(type==='ball'){disc(hx,hy,8,INK);disc(hx,hy,7,d.acc);disc(hx-2,hy-2,3,lt(d.acc,.35))}
+  else if(type==='claw'){rect(hx-3,hy-3,7,7,INK);rect(hx-2,hy-2,5,5,d.skin);
+    for(let i=-1;i<=1;i++){line(hx+f*3,hy+i*3,hx+f*10,hy+i*3+(i*1),3,INK);line(hx+f*3,hy+i*3,hx+f*9,hy+i*3+(i*1),1,'#fff')}}
+  else if(type==='bare'){disc(hx,hy,5,INK);disc(hx,hy,4,d.skin);rect(hx+f*2,hy-1,3,1,INK);rect(hx+f*2,hy+1,3,1,INK)}
+  else{rect(hx-4,hy-4,8,8,INK);rect(hx-3,hy-3,6,6,d.acc);rect(hx-3,hy-3,6,2,lt(d.acc,.3));
+    for(let i=-1;i<=1;i++)rect(hx+f*4,hy+i*2-1,2,2,'#ffffff')}
+}
 function stand(a,alpha){
-  const d=a.d.st,f=a.f,t=a.t,S=1.2,vr=(a.d.stand.length+a.d.stand.charCodeAt(0))%4;
+  const d=a.d.st,f=a.f,t=a.t,F=SF[a.d.stand]||SF_DEF,S=F.sc;
   const k=alpha==null?1:alpha;
   const sx=a.x+f*a.sOff,sy=a.y-9+Math.sin(t*3)*2;
   const P=standPose(a),J=rigJ(sx,sy,f,P,S);
   const ap=ease(a.standT)*k;
   if(ap<=0)return;
   cx.globalAlpha=ap*.9+(a.standT<1?(Math.random()<.4?-.4:0):0);
-  const body=d.body,bd=dk(body,.35);
+  const body=d.body,bd=dk(body,.35),th=F.th,bw=F.bw,lg=Math.max(4,Math.round(bw*.38));
+  const tail=F.legs==='tail',robe=F.legs==='robe';
   // aura
-  cx.globalAlpha=.16*ap;disc(J.hx,J.hy-14,30,d.glow);cx.globalAlpha=.1*ap;disc(J.hx,J.hy-14,38,d.glow);
-  cx.globalAlpha=.92*ap;
-  const th=6;
-  // contour lumineux néon
+  cx.globalAlpha=.16*ap;disc(J.hx,J.hy-14,22+S*6,d.glow);cx.globalAlpha=.1*ap;disc(J.hx,J.hy-14,30+S*6,d.glow);
+  // contour lumineux
   cx.globalAlpha=.3*ap;
-  [[J.sx,J.sy,J.aB[0],J.aB[1],th+5],[J.aB[0],J.aB[1],J.aB[2],J.aB[3],th+4],[J.hx,J.hy,J.lB[0],J.lB[1],11],[J.lB[0],J.lB[1],J.lB[2],J.lB[3],9],
-   [J.hx,J.hy,J.sx,J.sy,19],[J.hx,J.hy,J.lF[0],J.lF[1],11],[J.lF[0],J.lF[1],J.lF[2],J.lF[3],9],[J.sx,J.sy,J.aF[0],J.aF[1],th+5],[J.aF[0],J.aF[1],J.aF[2],J.aF[3],th+4]]
-   .forEach(q=>line(q[0],q[1],q[2],q[3],q[4],d.glow));
+  const nl=[[J.sx,J.sy,J.aB[0],J.aB[1],th+5],[J.aB[0],J.aB[1],J.aB[2],J.aB[3],th+4],[J.hx,J.hy,J.sx,J.sy,bw+6],[J.sx,J.sy,J.aF[0],J.aF[1],th+5],[J.aF[0],J.aF[1],J.aF[2],J.aF[3],th+4]];
+  if(!tail&&!robe)nl.push([J.hx,J.hy,J.lB[0],J.lB[1],lg+6],[J.lB[0],J.lB[1],J.lB[2],J.lB[3],lg+4],[J.hx,J.hy,J.lF[0],J.lF[1],lg+6],[J.lF[0],J.lF[1],J.lF[2],J.lF[3],lg+4]);
+  nl.forEach(q=>line(q[0],q[1],q[2],q[3],q[4],d.glow));
   cx.globalAlpha=.92*ap;
-  // écharpe d'énergie flottante
-  for(let i=0;i<8;i++){
-    const rx=J.sx-f*(3+i*5.5),ry=J.sy-3+Math.sin(t*7+i*.8)*(2+i*.5)+i*.9,w=Math.max(1,5-i*.55);
-    if(i<7){const nx=J.sx-f*(3+(i+1)*5.5),ny=J.sy-3+Math.sin(t*7+(i+1)*.8)*(2+(i+1)*.5)+(i+1)*.9;
-      line(rx,ry,nx,ny,w+2,'#0d0718');line(rx,ry,nx,ny,w,i%2?d.glow:d.acc)}
-  }
+  F.feat.forEach(n=>drawFeat(n,J,f,t,d,ap,false));
+  // queue de serpent / bas du corps
+  if(tail){let px=J.hx,py=J.hy+2;for(let i=0;i<9;i++){const nx=px-f*5+Math.sin(t*4+i*.7)*1,ny=py+3.2+Math.sin(t*5+i*.9)*1.5;const w=Math.max(2,bw*.6-i*.9);
+      line(px,py,nx,ny,w+2,INK);line(px,py,nx,ny,w,i%2?body:bd);px=nx;py=ny}}
   limb(J.sx,J.sy,J.aB[0],J.aB[1],th,bd,f);limb(J.aB[0],J.aB[1],J.aB[2],J.aB[3],th-1,d.skin,f);
-  limb(J.hx,J.hy,J.lB[0],J.lB[1],5,bd,f);limb(J.lB[0],J.lB[1],J.lB[2],J.lB[3],4,bd,f);
-  limb(J.hx,J.hy,J.sx,J.sy,13,body,f);
-  fr(J.hx,J.hy,f,-6,-4,12,2,d.acc);rect(J.sx-2,J.sy+4,4,4,d.glow);rect(J.sx-1,J.sy+5,2,2,'#fff');
-  limb(J.sx-f*6,J.sy-1,J.sx-f*6,J.sy+4,5,d.acc,f);limb(J.sx+f*6,J.sy-1,J.sx+f*6,J.sy+4,5,d.acc,f);  // épaulières
-  // plastron, veines d'énergie, détails propres à chaque Stand
+  if(!tail&&!robe){limb(J.hx,J.hy,J.lB[0],J.lB[1],lg,bd,f);limb(J.lB[0],J.lB[1],J.lB[2],J.lB[3],lg-1,bd,f)}
+  limb(J.hx,J.hy,J.sx,J.sy,bw,body,f);
+  fr(J.hx,J.hy,f,-bw/2,-4,bw,2,d.acc);
+  limb(J.sx-f*(bw/2),J.sy-1,J.sx-f*(bw/2),J.sy+4,5,d.acc,f);limb(J.sx+f*(bw/2),J.sy-1,J.sx+f*(bw/2),J.sy+4,5,d.acc,f);  // épaulières
   {
     const mx=(J.hx+J.sx)/2,my=(J.hy+J.sy)/2;
-    line(J.sx-f*5,J.sy+1,mx,my+4,4,'#0d0718');line(J.sx+f*5,J.sy+1,mx,my+4,4,'#0d0718');
-    line(J.sx-f*5,J.sy+1,mx,my+3,2,lt(body,.25));line(J.sx+f*5,J.sy+1,mx,my+3,2,lt(body,.15));
-    rect(mx-3,my-1,6,6,'#0d0718');rect(mx-2,my,4,4,d.acc);rect(mx-1,my+1,2,2,Math.floor(t*4)%2?'#ffffff':d.glow);
-    for(let i=0;i<3;i++)rect(mx-4+i*3,my+7,2,1,bd);
+    line(J.sx-f*bw*.4,J.sy+1,mx,my+4,4,INK);line(J.sx+f*bw*.4,J.sy+1,mx,my+4,4,INK);
+    line(J.sx-f*bw*.4,J.sy+1,mx,my+3,2,lt(body,.25));line(J.sx+f*bw*.4,J.sy+1,mx,my+3,2,lt(body,.15));
+    drawChest(F.chest,mx,my,f,t,d,bd,J);
     cx.globalAlpha=(.55+.35*Math.sin(t*9))*ap;
-    line(J.sx,J.sy,J.aF[0],J.aF[1],1,d.glow);line(J.sx,J.sy,J.aB[0],J.aB[1],1,d.glow);line(mx,my+5,J.hx,J.hy,1,d.glow);
+    line(J.sx,J.sy,J.aF[0],J.aF[1],1,d.glow);line(J.sx,J.sy,J.aB[0],J.aB[1],1,d.glow);
     cx.globalAlpha=.92*ap;
-    if(vr===1){line(J.sx+f*1,J.sy-3,J.sx+f*5,J.sy-12,4,'#0d0718');line(J.sx+f*1,J.sy-3,J.sx+f*5,J.sy-11,2,d.acc);line(J.sx-f*5,J.sy-3,J.sx-f*10,J.sy-11,4,'#0d0718');line(J.sx-f*5,J.sy-3,J.sx-f*10,J.sy-10,2,d.acc)}
-    if(vr===2){ring(mx,my+2,9,'#0d0718',3);ring(mx,my+2,9,d.glow,1)}
-    if(vr===3){line(J.hx-f*6,J.hy,J.hx+f*6,J.hy,3,'#0d0718');for(let i=-1;i<=1;i++)rect(J.hx+i*4-1,J.hy-2,2,5,d.acc)}
   }
   const hx=J.hd[0],hy=J.hd[1];
-  rect(hx-6,hy-6,12,12,'#0d0718');rect(hx-5,hy-5,10,10,d.skin);
-  fr(hx,hy,f,-1,-2,7,3,'#0d0718');fr(hx,hy,f,0,-2,6,2,d.glow);               // visière
-  fr(hx,hy,f,1,-4,6,1,'#0d0718');fr(hx,hy,f,3,-3,3,1,'#ffffff');fr(hx,hy,f,-4,3,9,2,'#0d0718');
-  for(let i=0;i<4;i++)rect(hx+f*(-3+i*2)-(f<0?1:0),hy+3,1,2,d.acc);          // grille de bouche
-  if(d.crest==='horn'){line(hx-3,hy-6,hx-5,hy-13,3,'#0d0718');line(hx+3,hy-6,hx+5,hy-13,3,'#0d0718');line(hx-3,hy-6,hx-5,hy-12,1,d.acc);line(hx+3,hy-6,hx+5,hy-12,1,d.acc)}
-  else if(d.crest==='thorn'){line(hx-f*2,hy-6,hx-f*7,hy-14,4,'#0d0718');line(hx-f*2,hy-6,hx-f*7,hy-13,2,d.acc);line(hx+f*2,hy-6,hx+f*2,hy-15,4,'#0d0718');line(hx+f*2,hy-6,hx+f*2,hy-14,2,d.acc)}
-  else if(d.crest==='halo'){ring(hx,hy-12,7,'#0d0718',4);ring(hx,hy-12,7,d.acc,2)}
-  else if(d.crest==='crown'){for(let i=-1;i<=1;i++){line(hx+i*4,hy-6,hx+i*4,hy-12-(i===0?3:0),4,'#0d0718');line(hx+i*4,hy-6,hx+i*4,hy-11-(i===0?3:0),2,d.acc)}}
-  else{rect(hx-4,hy-9,8,4,'#0d0718');rect(hx-3,hy-8,6,2,d.acc)}               // diadème
-  limb(J.hx,J.hy,J.lF[0],J.lF[1],5,body,f);limb(J.lF[0],J.lF[1],J.lF[2],J.lF[3],4,body,f);
+  drawHead(F.head,hx,hy,f,d,t,body);
+  if(F.head!=='hood'&&F.head!=='sun'&&F.head!=='eclipse'&&F.head!=='beast'){
+    if(d.crest==='horn'){line(hx-3,hy-6,hx-5,hy-13,3,INK);line(hx+3,hy-6,hx+5,hy-13,3,INK);line(hx-3,hy-6,hx-5,hy-12,1,d.acc);line(hx+3,hy-6,hx+5,hy-12,1,d.acc)}
+    else if(d.crest==='thorn'){line(hx-f*2,hy-6,hx-f*7,hy-14,4,INK);line(hx-f*2,hy-6,hx-f*7,hy-13,2,d.acc);line(hx+f*2,hy-6,hx+f*2,hy-15,4,INK);line(hx+f*2,hy-6,hx+f*2,hy-14,2,d.acc)}
+    else if(d.crest==='halo'){ring(hx,hy-12,7,INK,4);ring(hx,hy-12,7,d.acc,2)}
+    else if(d.crest==='crown'){for(let i=-1;i<=1;i++){line(hx+i*4,hy-6,hx+i*4,hy-12-(i===0?3:0),4,INK);line(hx+i*4,hy-6,hx+i*4,hy-11-(i===0?3:0),2,d.acc)}}
+    else{rect(hx-4,hy-9,8,4,INK);rect(hx-3,hy-8,6,2,d.acc)}
+  }
+  if(!tail&&!robe){limb(J.hx,J.hy,J.lF[0],J.lF[1],lg,body,f);limb(J.lF[0],J.lF[1],J.lF[2],J.lF[3],lg-1,body,f)}
   limb(J.sx,J.sy,J.aF[0],J.aF[1],th,body,f);limb(J.aF[0],J.aF[1],J.aF[2],J.aF[3],th-1,d.skin,f);
-  rect(J.aF[2]-4,J.aF[3]-4,8,8,'#0d0718');rect(J.aF[2]-3,J.aF[3]-3,6,6,d.acc);rect(J.aF[2]-3,J.aF[3]-3,6,2,lt(d.acc,.3));
-  for(let i=-1;i<=1;i++)rect(J.aF[2]+f*4,J.aF[3]+i*2-1,2,2,'#ffffff');             // pointes de poing
+  drawHand(F.hand,J,f,d,body);
   {const ex=(J.aF[0]+J.aF[2])/2,ey=(J.aF[1]+J.aF[3])/2;
-   line(ex-3,ey-3,ex+3,ey+3,3,'#0d0718');line(ex-3,ey-3,ex+3,ey+3,1,d.glow);
-   if(vr===0||vr===3){for(let i=0;i<2;i++)line(ex-4+i*3,ey-2,ex-4+i*3,ey+3,2,d.acc)}}
-  if(a.sMode==='rush'){ // poings fantômes
+   line(ex-3,ey-3,ex+3,ey+3,3,INK);line(ex-3,ey-3,ex+3,ey+3,1,d.glow)}
+  F.feat.forEach(n=>drawFeat(n,J,f,t,d,ap,true));
+  const hr=F.hand==='ball'?8:5;
+  if(a.sMode==='rush'){
     cx.globalAlpha=.55*ap;
     for(let i=0;i<5;i++){const o=(i*9+(t*260)%9),yy=J.aF[3]+Math.sin(t*50+i*2)*10;
       rect(J.aF[2]+f*o-2,yy-2,5,5,d.glow);rect(J.aF[2]+f*o-1,yy-1,3,3,'#fff')}
@@ -587,9 +739,8 @@ function stand(a,alpha){
   if(a.sMode==='punch'&&atkExt(a)>.25){
     cx.globalAlpha=.5*ap;const fx=(a.atk&&a.atk.id===2)?J.lF[2]:J.aF[2],fy=(a.atk&&a.atk.id===2)?J.lF[3]:J.aF[3];
     for(let i=1;i<4;i++){rect(fx-f*i*7-2,fy-2,5,5,d.glow)}
-    disc(fx,fy,7,d.glow);cx.globalAlpha=.9*ap;disc(fx,fy,3,'#fff');
+    disc(fx,fy,hr+2,d.glow);cx.globalAlpha=.9*ap;disc(fx,fy,3,'#fff');
   }
-  // étincelles d'énergie et onomatopée
   for(let i=0;i<7;i++){
     const ph=(t*24+i*13)%46,sx2=J.hx+Math.sin(t*2.3+i*1.7)*(14+i*1.5),sy2=J.hy+6-ph;
     cx.globalAlpha=Math.max(0,1-ph/46)*.9*ap;rect(sx2,sy2,2,2,i%2?d.glow:'#ffffff');
@@ -597,10 +748,11 @@ function stand(a,alpha){
   cx.globalAlpha=1;
   if(alpha==null&&ap>.7&&(a.sMode==='rush'||a.sMode==='pose'||a.standLock||a.sMode==='punch')){
     const sh=Math.floor(t*14)%2;
-    txt('ゴ',J.hx-f*10+sh,J.hy-44,12,d.glow,'center','#0d0718');txt('ゴ',J.hx+f*10-sh,J.hy-40,10,d.acc,'center','#0d0718');
+    txt('ゴ',J.hx-f*10+sh,J.hy-44,12,d.glow,'center',INK);txt('ゴ',J.hx+f*10-sh,J.hy-40,10,d.acc,'center',INK);
   }
   a.sFist=[J.aF[2],J.aF[3]];
 }
+
 /* ===== 4 : sons (WebAudio synthétisé) ===== */
 const SND={ctx:null,on:true,master:null,mus:null};
 function sndInit(){

@@ -69,4 +69,6 @@ L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le
 | 29 | PIXEL RIVA | GLITCH | SAUT DE GLITCH (téléportation dans le dos de l'adversaire) | ERREUR FATALE | Se téléporte dans ton dos et frappe deux fois avant de projeter. |
 | 30 | KONRAD IRON | TITAN | UPPERCUT DU TITAN (coup montant) | POING DU TITAN | Se rue sur l'adversaire et l'écrase d'un poing géant (44 dégâts). |
 
+Chaque Stand a sa propre silhouette (corpulence, tête, torse, mains) et ses propres accessoires : ailes, queue de serpent, cape, tentacules, engrenages, éclairs, chaînes, flammes, cristaux, anneaux.
+
 Tous les personnages et les Stands sont originaux.
