@@ -30,7 +30,7 @@ L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le
 | Garde (tenir appuyé, réduit fortement les dégâts de face) | GARDE | S ou Maj |
 | Esquive (courte invincibilité) | ESQUIVE | U ou E |
 | Ultime (barre orange pleine) | ULTIME | L |
-| Activer / désactiver le Stand (Stand sorti en permanence : dégâts +30 %, mais la jauge bleue se vide doucement) | STAND | Q ou O |
+| Activer / désactiver le Stand (il reste sorti, même après une rafale, jusqu'à ce que tu rappuies : dégâts +30 %, jauge bleue qui se recharge plus lentement) | STAND | Q ou O |
 
 ## Combattants
 

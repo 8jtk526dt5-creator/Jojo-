@@ -824,8 +824,8 @@ function standStep(a,dt){
   if(a.isFoe)return;
   if(a.standHold>0){a.standHold-=dt;if(a.standHold<=0&&!a.standLock)a.standOn=false}
   if(a.standLock){
-    if(a.gauge<=0||a.hp<=0||a.st==='ko'){a.standLock=false;a.standOn=false}
-    else{a.standOn=true;a.gauge=Math.max(0,a.gauge-5*dt);return}
+    if(a.hp<=0||a.st==='ko'){a.standLock=false;a.standOn=false}
+    else{a.standOn=true;a.gauge=Math.min(100,a.gauge+7*dt);return}   // Stand sorti : la jauge se recharge plus lentement
   }
   a.gauge=Math.min(100,a.gauge+16*dt);
 }
@@ -835,7 +835,7 @@ function updPlayer(a,o,dt){
   if(a.frozen>0){inp.jump=inp.hit=inp.rush=inp.spec=inp.dash=inp.ult=inp.stand=false;a.guarding=false;return}
   if(inp.stand){inp.stand=false;
     if(a.standLock){a.standLock=false;a.standOn=false;sfx.swing();spark(a.x,a.y-26,'#8a78b0',8)}
-    else if(a.gauge>=10){a.standLock=true;a.standOn=true;sfx.stand();spark(a.x,a.y-26,a.d.st.glow,16)}}
+    else{a.standLock=true;a.standOn=true;sfx.stand();spark(a.x,a.y-26,a.d.st.glow,16)}}
   const free=a.st==='idle'||a.st==='walk'||a.st==='jump'||a.st==='block';
   const air=a.y<GROUND-.5;
   a.guarding=false;
@@ -1590,7 +1590,7 @@ function startRound(){
   foe=mk(G.opps[G.round],true);
   Object.assign(me,{x:WORLD/2-100,y:GROUND,vx:0,vy:0,f:1,hp:Math.min(me.max,me.hp+Math.round(me.max*.3)),st:'idle',stT:0,atk:null,standOn:false,standT:0,
     frozen:0,inv:0,boost:0,comboN:0,comboT:0,guarding:false,queued:false,air:false,
-    slow:0,haste:0,poison:0,counter:0,regen:0,shieldT:0,hist:[],histT:0,specCd:2,standHold:0,standLock:false});
+    slow:0,haste:0,poison:0,counter:0,regen:0,shieldT:0,hist:[],histT:0,specCd:2,standHold:0});
   me.trail=me.hp;
   G.proj=[];G.bolts=[];G.beam=null;G.timeStop=0;G.tsOwner=null;G.slow=1;G.slowT=0;G.ghosts=[];G.timers=[];
   G.cam=WORLD/2-W/2;
