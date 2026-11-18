@@ -425,7 +425,7 @@ function walkLegs(ph){
 function getPose(a){
   const t=a.t,p=a.stT;
   const br=Math.sin(t*3.2)*.03;
-  if(a.ducking&&(a.st==='idle'||a.st==='walk'||a.st==='block'))return mkP(.38,0,[1.1,2.6],[1.3,2.8],[.6,-.5],[1.05,-.15],3);
+  if(a.ducking&&(a.st==='idle'||a.st==='walk'||a.st==='block'))return mkP(.55,0,[1.2,2.7],[1.4,2.9],[1.5,-1.2],[1.5,.9],0);
   switch(a.st){
   case 'walk':{
     const dirn=(a.vx*a.f>=0)?1:-1,ph=t*11*dirn,L=walkLegs(ph);
