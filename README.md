@@ -21,8 +21,8 @@ Bouton EN LIGNE sur l'écran de sélection : un joueur crée une partie (code à
 ## Style des personnages
 Chaque combattant a son look : bandeaux, lunettes, casquettes, chapeaux, couronnes, boucles d'oreille, épaulières, gants, emblèmes, chaînes, capes, cols, genouillères, tatouages et lumière de contour.
 
-## Mode horizontal
-Si l'appli reste en portrait, le jeu se tourne tout seul de 90° (arène en paysage). Le bouton ⟳ ÉCRAN (menu) ou ⟳ (en combat) change le sens, puis désactive le mode.
+## Orientation
+Le jeu s'adapte à l'orientation du téléphone : en horizontal tu joues en horizontal, en vertical tu joues en vertical.
 
 ## Arène
 
