@@ -38,7 +38,7 @@ p.sub{margin:0;font-size:clamp(11px,3vw,14px);opacity:.85;max-width:34ch;line-he
 .pick button.on{background:var(--magenta);border-color:var(--gold)}
 #pad{flex:1;min-height:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
 .grp{display:grid;gap:8px}
-#dirs{grid-template-columns:repeat(2,62px)}
+#dirs{grid-template-columns:repeat(3,48px);gap:5px}
 #acts{grid-template-columns:repeat(3,60px);align-items:center;gap:6px}
 #ultk{grid-column:1 / span 3;border-radius:30px;height:44px}
 .k{height:56px;border-radius:50%;border:3px solid var(--paper);background:var(--violet);color:var(--paper);font-family:var(--display);font-size:12px;letter-spacing:0;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1;overflow:hidden;white-space:nowrap}
@@ -54,7 +54,7 @@ p.sub{margin:0;font-size:clamp(11px,3vw,14px);opacity:.85;max-width:34ch;line-he
   #stage{max-width:none;width:min(100vw,calc(100vh*1.7778));height:auto;margin:0 auto;border-radius:0;box-shadow:none;border-width:0}
   #pad{position:absolute;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));bottom:6px;padding:0;pointer-events:none}
   #pad .k{pointer-events:auto;opacity:.82}
-  #dirs{grid-template-columns:repeat(2,64px)}#dirs .k{height:64px}
+  #dirs{grid-template-columns:repeat(3,56px)}#dirs .k{height:64px}
   #acts{grid-template-columns:repeat(3,52px)}.k{height:52px;font-size:13px}#ultk{height:38px}
 }
 @media (prefers-reduced-motion:reduce){.k.ready{animation:none}}
@@ -88,9 +88,9 @@ body.menu #pad{display:none}
 :root{--u:clamp(40px,min(16vw,10.5vh),90px);--padh:calc(var(--u)*2.7 + 30px)}
 #stage{max-width:min(100%,calc((100vh - var(--padh) - 14px)*1.7778))}
 #pad{flex:none;gap:8px;padding-top:2px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
-#dirs{grid-template-columns:repeat(2,calc(var(--u)*1.1))}
+#dirs{grid-template-columns:repeat(3,calc(var(--u)*.76));gap:5px}
 #dirs .k{height:calc(var(--u)*1.2);font-size:calc(var(--u)*.5)}
-#acts{grid-template-columns:repeat(3,calc(var(--u)*1.08));gap:6px}
+#acts{grid-template-columns:repeat(3,calc(var(--u)*.98));gap:6px}
 .k{height:var(--u);font-size:clamp(9px,calc(var(--u)*.22),17px)}
 #ultk{height:calc(var(--u)*.72);grid-column:1 / span 2;border-radius:30px}
 #standk{height:calc(var(--u)*.72);border-radius:30px;background:var(--violet)}
@@ -165,6 +165,7 @@ body.menu #stage{max-width:min(100%,calc(30vh*1.7778))}
 <div id="pad">
   <div class="grp" id="dirs">
     <div class="k" data-k="left">◀</div>
+    <div class="k" data-k="duck">▼</div>
     <div class="k" data-k="right">▶</div>
   </div>
   <div class="grp" id="acts">
@@ -396,6 +397,7 @@ function walkLegs(ph){
 function getPose(a){
   const t=a.t,p=a.stT;
   const br=Math.sin(t*3.2)*.03;
+  if(a.ducking&&(a.st==='idle'||a.st==='walk'||a.st==='block'))return mkP(.38,0,[1.1,2.6],[1.3,2.8],[.6,-.5],[1.05,-.15],3);
   switch(a.st){
   case 'walk':{
     const dirn=(a.vx*a.f>=0)?1:-1,ph=t*11*dirn,L=walkLegs(ph);
@@ -921,7 +923,7 @@ function musicTick(dt,round,intense){
   if(n%4===2)noise(.04,.1,3000,6000);
 }
 /* ===== 5 : logique de combat ===== */
-const inp={left:false,right:false,jump:false,hit:false,rush:false,spec:false,guard:false,dash:false,ult:false,stand:false};
+const inp={left:false,right:false,jump:false,hit:false,rush:false,spec:false,guard:false,duck:false,dash:false,ult:false,stand:false};
 const G={mode:'menu',round:0,t:0,shake:0,hitstop:0,slow:1,slowT:0,msg:'',sub:'',msgT:0,
   parts:[],words:[],proj:[],bolts:[],ghosts:[],rings:[],bursts:[],picked:0,cam:0,diff:1,opps:[],timers:[],tsOwner:null,pose:0,flash:0,won:false,ko:0,
   timeStop:0,beam:null,castBy:null,tsTick:0};
@@ -977,6 +979,7 @@ function koFx(o,dir){
 }
 function strike(a,o,dmg,kb,launch,heavy,ub){
   if(o.hp<=0)return false;
+  if(o.ducking&&!launch&&!heavy&&!ub&&o.frozen<=0&&o.st!=='hurt'){G.words.push({x:o.x,y:o.y-50,t:.5,max:.5,s:'BAS !',col:'#9fe8ff'});return false}
   if(o.inv>0){if(o.shieldT>0)G.rings.push({x:o.x,y:o.y-28,r:6,t:.2,max:.2,col:o.d.st.glow});return false}
   const dir=o.x>=a.x?1:-1,front=(a.x-o.x)*o.f>0,ix=o.x-dir*6,hy=o.y-28;
   if(o.counter>0&&front&&o.frozen<=0){
@@ -1103,9 +1106,10 @@ function updPlayer(a,o,dt){
   const mv=(inp.right?1:0)-(inp.left?1:0);
   if(free){
     a.f=o.x>a.x?1:-1;
+    a.ducking=!!inp.duck&&!air;
     if(inp.guard&&!air){a.guarding=true;a.st='block';a.vx*=.6}
     else{
-      const sp=134*a.d.spd*(a.boost>0?1.25:1);
+      const sp=134*a.d.spd*(a.boost>0?1.25:1)*(a.ducking?.3:1);
       a.vx=lerp(a.vx,mv*sp,Math.min(1,dt*(air?16:22)));
       a.st=air?'jump':(Math.abs(mv)?'walk':'idle');
     }
@@ -1117,7 +1121,7 @@ function updPlayer(a,o,dt){
     else if(inp.rush&&!a.guarding&&a.gauge>=25)startRush(a);
     else if(inp.spec&&!a.guarding&&a.specCd<=0)useSpec(a,o);
     if(inp.ult&&a.ult>=100)castUlt(a);
-  }else if(a.st==='atk'&&inp.hit&&a.atk&&a.atk.id<2&&a.stT>a.atk.w)a.queued=true;
+  }else{if(a.st!=='atk')a.ducking=false;if(a.st==='atk'&&inp.hit&&a.atk&&a.atk.id<2&&a.stT>a.atk.w)a.queued=true}
   if(a.st==='atk'&&a.atk&&a.atk.id<9&&inp.dash&&a.dashCd<=0&&a.stT>=a.atk.w+a.atk.a){   // annulation de coup par une esquive
     const dir=mv||-a.f;a.atk=null;a.queued=false;setSt(a,'dash',.22);a.vx=dir*390;a.inv=.22;a.dashCd=.32;ghost(a);sfx.dash();dust(a.x,GROUND,5);
   }
@@ -1854,7 +1858,7 @@ function render(){
    que tes coups lui font (dégâts, gel, poison…) lui est envoyé sous forme de petits messages numérotés. */
 const NET={on:false,room:null,code:'',started:false,seq:0,out:[],seen:0,acc:0,rdy:0,peerRdy:0,re:0,peerRe:0,pick:0,peerPick:null,
   score:[0,0],cur:{hp:0,set:{},ev:[]},applying:0,peerId:null,myId:null,last:0,unsub:null};
-const FWD=new Set(['st','stT','stDur','vx','vy','x','y','frozen','fzHits','fzCol','fzType','poison','dps','slow','atk','queued','guarding']);
+const FWD=new Set(['st','stT','stDur','vx','vy','x','y','frozen','fzHits','fzCol','fzType','poison','dps','slow','atk','queued','guarding','ducking']);
 const NUMK=new Set(['stT','stDur','vx','vy','x','y','frozen','fzHits','poison','dps','slow']);
 const STATES=new Set(['idle','walk','jump','atk','hurt','block','dash','down','getup','ko','pose']);
 const r1=v=>Math.round((+v||0)*10)/10,r2=v=>Math.round((+v||0)*100)/100;
@@ -2176,7 +2180,7 @@ function tick(rdt){
 }
 
 /* ---------- commandes ---------- */
-const HELD={left:1,right:1,guard:1};
+const HELD={left:1,right:1,guard:1,duck:1};
 document.querySelectorAll('[data-k]').forEach(el=>{
   const k=el.dataset.k;
   const on=e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
@@ -2187,12 +2191,12 @@ document.querySelectorAll('[data-k]').forEach(el=>{
   el.addEventListener('contextmenu',e=>e.preventDefault());
 });
 const KM={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',
-  KeyJ:'hit',KeyK:'rush',KeyI:'spec',KeyL:'ult',KeyS:'guard',ShiftLeft:'guard',KeyU:'dash',KeyE:'dash',KeyQ:'stand',KeyO:'stand'};
+  KeyJ:'hit',KeyK:'rush',KeyI:'spec',KeyL:'ult',KeyS:'guard',ArrowDown:'duck',KeyC:'duck',ShiftLeft:'guard',KeyU:'dash',KeyE:'dash',KeyQ:'stand',KeyO:'stand'};
 addEventListener('keydown',e=>{const k=KM[e.code];if(k){e.preventDefault();sndInit();inp[k]=true}});
 addEventListener('keyup',e=>{const k=KM[e.code];if(k&&HELD[k])inp[k]=false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(!e.target.closest('#grid'))e.preventDefault()},{passive:false});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){inp.left=inp.right=inp.guard=false}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){inp.left=inp.right=inp.guard=inp.duck=false}});
 
 /* ---------- sélection du combattant ---------- */
 function drawIcon(c,d){

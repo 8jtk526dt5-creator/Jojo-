@@ -30,6 +30,7 @@ L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le
 | Action | Tactile | Clavier |
 | --- | --- | --- |
 | Bouger | ◀ ▶ | Flèches ou A / D |
+| Se baisser (tenir) : esquive les coups hauts et les projectiles, pas les balayages ni les coups lourds | ▼ | Bas ou C |
 | Sauter | SAUT | Haut, W ou Espace |
 | Attaque normale (appuie plusieurs fois pour enchaîner jab, crochet, coup de pied). Avec le Stand activé, c'est le Stand qui frappe, avec une portée plus longue | COUP | J |
 | Rafale du Stand (coûte de la jauge bleue, qui se recharge) | RAFALE | K |
