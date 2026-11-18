@@ -18,6 +18,9 @@ Déplacement plus rapide, saut plus haut, **double saut** (appuie une seconde fo
 
 Bouton EN LIGNE sur l'écran de sélection : un joueur crée une partie (code à 4 caractères), l'autre entre le code. Duel en deux manches gagnantes, chacun avec le combattant qu'il a choisi. Le mode en ligne utilise la salle partagée de la page publiée sur Claude (capacité `room`) : il ne marche pas depuis ce dépôt ou un fichier local, et les deux joueurs doivent pouvoir ouvrir la page (connectés, invités).
 
+## Style des personnages
+Chaque combattant a son look : bandeaux, lunettes, casquettes, chapeaux, couronnes, boucles d'oreille, épaulières, gants, emblèmes, chaînes, capes, cols, genouillères, tatouages et lumière de contour.
+
 ## Arène
 
 L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le décor défile quand vous vous déplacez.

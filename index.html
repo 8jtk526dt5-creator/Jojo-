@@ -483,6 +483,7 @@ function human(a,alpha,ns){
   if(!ns)shadow(a.x,GROUND,lying?44:28,.5*(alpha==null?1:alpha));
   const th=Math.round(5*S),sway=Math.sin(a.t*6)*2+(a.vx||0)*-.02*f;
   const pantsB=dk(d.pants,.3),topB=dk(d.top,.3),skinB=dk(d.skin,.25);
+  gearBack(a,J,f,lying);
   // manteau (derrière)
   if(d.coat){
     const cs=clamp(-(a.vx||0)*f*.05,-5,7)+Math.sin(a.t*3)*1.2;
@@ -503,6 +504,7 @@ function human(a,alpha,ns){
   fr(J.hx,J.hy,f,-5,-3,11,2,d.acc);                                     // ceinture
   limb(J.sx-f*1,J.sy+2,J.hx-f*1,J.hy-2,3,d.coat||lt(d.top,.12),f);     // pan central
   rect(J.sx-1,J.sy+3,2,2,d.acc);
+  gearBody(a,J,f,S);
   // tête
   const hx=J.hd[0],hy=J.hd[1],hurt=a.st==='hurt'||lying;
   rect(hx-6,hy-6,12,12,'#0d0718');rect(hx-5,hy-5,10,10,d.skin);rect(hx-5,hy+2,10,3,dk(d.skin,.15));
@@ -512,12 +514,14 @@ function human(a,alpha,ns){
     fr(hx,hy,f,1,-2,4,3,'#ffffff');fr(hx,hy,f,3,-2,2,3,'#0d0718');
     fr(hx,hy,f,0,-4,5,1,'#0d0718');fr(hx,hy,f,1,3,3,1,dk(d.skin,.5));
   }
+  gearHead(a,hx,hy,f,hurt);
   // jambe avant
   limb(J.hx,J.hy,J.lF[0],J.lF[1],th+1,d.pants,f);limb(J.lF[0],J.lF[1],J.lF[2],J.lF[3],th,d.pants,f);
   limb(J.lF[2]-f,J.lF[3]-1,J.lF[2]+f*5,J.lF[3],4,d.boot,f);
   // bras avant
   limb(J.sx,J.sy,J.aF[0],J.aF[1],th,d.top,f);limb(J.aF[0],J.aF[1],J.aF[2],J.aF[3],th-1,d.skin,f);
   rect(J.aF[2]-3,J.aF[3]-3,6,6,'#0d0718');rect(J.aF[2]-2,J.aF[3]-2,4,4,d.skin);rect(J.aF[2]-2,J.aF[3]-2,4,1,lt(d.skin,.25));
+  gearHands(a,J,f);
   cx.globalAlpha=1;
   a.fist=[J.aF[2],J.aF[3]];a.head=[hx,hy];
 }
@@ -774,6 +778,90 @@ function stand(a,alpha){
   a.sFist=[J.aF[2],J.aF[3]];
 }
 
+/* ===== accessoires et allure de chaque combattant ===== */
+const GEAR={
+ 'CRONOS':{head:'shades',hc:'G',ear:1,pads:'round',glove:'#14141e',emblem:'diamond',ec:'G',chain:1},
+ 'MIRELLA':{head:'band',hc:'A',ear:1,pads:'spike',glove:'A',knee:1,belt:'sash'},
+ 'KAÏTO VANCE':{head:'mask',hc:'#1a1228',eyeglow:'G',cape:'#2a1f4a',glove:'#1a1228'},
+ 'LUNA FERRO':{head:'hat',hc:'#2b2a52',collar:1,ear:1,emblem:'dot',ec:'A'},
+ 'DOC MARROW':{head:'goggles',hc:'G',glove:'#f2f2f2',emblem:'cross',ec:'#e03a3a',collar:1},
+ 'BRUTUS KANE':{head:'band',hc:'#d8362f',pads:'spike',glove:'#202028',tat:1,chain:1},
+ 'NOX VESPER':{head:'mask',hc:'#0d0718',eyeglow:'G',cape:'#241540',collar:1},
+ 'DOCTEUR ORAGE':{head:'goggles',hc:'#ffd23f',ear:1,emblem:'bolt',ec:'#ffd23f',glove:'#2a2a3a',collar:1},
+ 'ZÉPHYRINE':{head:'band',hc:'G',ear:1,cape:'#9fe8d0',glove:'#d8fff0',knee:1},
+ 'IGNACE BRAISE':{head:'band',hc:'#ff7a1a',pads:'spike',emblem:'dot',ec:'#ffb03a',tat:1,glove:'#3a1a10'},
+ 'GLACIA NORD':{head:'crown',hc:'#bfeaff',cape:'#d8f4ff',collar:1,glove:'#e8f8ff'},
+ 'VOLT KÉROS':{head:'goggles',hc:'#35e0ff',emblem:'bolt',ec:'#fff27a',ear:1,glove:'#ffd23f',knee:1},
+ 'ORCHIDÉE LAM':{head:'band',hc:'#c27aff',ear:1,cape:'#6a3aa0',emblem:'dot',ec:'#ff9be8',glove:'#3a1a50'},
+ 'SANGUIN REX':{head:'shades',hc:'#ff2e4a',collar:1,cape:'#5a0f1c',chain:1,ear:1},
+ 'PERLE ABYSSE':{head:'band',hc:'#f2fbff',ear:1,cape:'#1f8f9a',emblem:'dot',ec:'#f2fbff',knee:1},
+ 'GRAVIT HELM':{head:'eyepatch',hc:'#14141e',pads:'round',chain:1,glove:'#2a2a3a',knee:1},
+ 'ARGUS PRISM':{head:'shades',hc:'#7ae8ff',collar:1,emblem:'diamond',ec:'#b0fff8',glove:'#d8e8ff'},
+ 'TURBO LÉO':{head:'cap',hc:'A',emblem:'bolt',ec:'#ffffff',glove:'#1a1a22',knee:1,belt:'sash'},
+ 'BASTIEN MURE':{head:'cap',hc:'#8a8f9c',pads:'round',emblem:'dot',ec:'#d0d0e0',glove:'#4d4d57',knee:1},
+ 'STELLA POLARIS':{head:'crown',hc:'#ffd23f',cape:'#1a1f5a',ear:1,emblem:'dot',ec:'#fff7b0'},
+ 'OSSIAN GRAVE':{head:'mask',hc:'#ebe6d2',eyeglow:'G',cape:'#1a1626',chain:1,tat:1},
+ 'MAGNUS PÔLE':{head:'goggles',hc:'#e84a4a',pads:'round',emblem:'dot',ec:'#4a8ae8',glove:'#2a2a3a'},
+ 'AYAME SORA':{head:'band',hc:'#f2f2ff',tails:1,mask:'#2a2a4a',ear:1,glove:'#2a2a4a'},
+ 'DJANGO CALIBRE':{head:'hat',hc:'#7a4a2a',collar:1,belt:'buckle',ear:1,glove:'#3a2a1a',chain:1},
+ 'FRIDA PUMA':{head:'band',hc:'#ffb03a',ear:1,tat:1,glove:'#3a2a1a',knee:1},
+ 'BARON SABLE':{head:'hat',hc:'#c9a05a',cape:'#a07a3a',collar:1,belt:'buckle'},
+ 'HELIOS AURÉ':{head:'crown',hc:'#ffd23f',pads:'round',cape:'#e8a82a',emblem:'dot',ec:'#fff',glove:'#ffd23f'},
+ 'NÉMÉSIS NEUF':{head:'shades',hc:'G',ear:1,collar:1,emblem:'diamond',ec:'G',glove:'#14141e'},
+ 'PIXEL RIVA':{head:'goggles',hc:'G',eyeglow:'G',emblem:'dot',ec:'#ffffff',ear:1,glove:'#1a1a2a'},
+ 'KONRAD IRON':{head:'band',hc:'#c23a3a',pads:'spike',glove:'#202028',tat:1,chain:1,knee:1}
+};
+function gcol(c,d){return c==='A'?d.acc:c==='G'?d.st.glow:c==='B'?d.st.body:c}
+function gearBack(a,J,f,lying){
+  const g=GEAR[a.d.name];if(!g||!g.cape)return;
+  const d=a.d,c=gcol(g.cape,d),cs=clamp(-(a.vx||0)*f*.06,-6,8)+Math.sin(a.t*3.4)*1.6;
+  limb(J.sx-f*2,J.sy-1,J.hx-f*(9+cs),J.hy+(lying?6:24),11,dk(c,.35),f);
+  limb(J.sx-f*2,J.sy-1,J.hx-f*(8+cs),J.hy+(lying?5:22),8,c,f);
+  line(J.hx-f*(12+cs),J.hy+(lying?6:24),J.hx-f*(4+cs),J.hy+(lying?6:24),2,lt(c,.3));
+}
+function gearBody(a,J,f,S){
+  const g=GEAR[a.d.name],d=a.d;
+  // lumière de contour sur le torse et la jambe avant (volume)
+  line(J.sx+f*Math.round(4*S),J.sy+1,J.hx+f*Math.round(4*S),J.hy-1,1,lt(d.top,.4));
+  line(J.hx+f*2,J.hy+2,J.lF[0]+f*2,J.lF[1],1,lt(d.pants,.3));
+  if(!g)return;
+  const mx=(J.hx+J.sx)/2,my=(J.hy+J.sy)/2;
+  if(g.collar){line(J.sx-f*4,J.sy-1,J.sx-f*6,J.sy-6,3,'#0d0718');line(J.sx-f*4,J.sy-1,J.sx-f*6,J.sy-5,1,lt(d.coat||d.top,.25));line(J.sx+f*3,J.sy-1,J.sx+f*5,J.sy-5,3,'#0d0718');line(J.sx+f*3,J.sy-1,J.sx+f*5,J.sy-4,1,lt(d.coat||d.top,.25))}
+  if(g.emblem){const c=gcol(g.ec||'A',d);
+    if(g.emblem==='cross'){rect(mx-1,my-3,3,7,'#0d0718');rect(mx-3,my-1,7,3,'#0d0718');rect(mx,my-2,1,5,c);rect(mx-2,my,5,1,c)}
+    else if(g.emblem==='bolt'){line(mx+1,my-4,mx-1,my,3,'#0d0718');line(mx-1,my,mx+1,my+4,3,'#0d0718');line(mx+1,my-4,mx-1,my,1,c);line(mx-1,my,mx+1,my+4,1,c)}
+    else if(g.emblem==='diamond'){line(mx,my-4,mx+3,my,3,'#0d0718');line(mx+3,my,mx,my+4,3,'#0d0718');line(mx,my+4,mx-3,my,3,'#0d0718');line(mx-3,my,mx,my-4,3,'#0d0718');rect(mx-1,my-1,2,2,c)}
+    else{disc(mx,my,4,'#0d0718');disc(mx,my,3,c);disc(mx-1,my-1,1,'#fff')}}
+  if(g.belt==='buckle'){fr(J.hx,J.hy,f,-1,-3,4,4,'#0d0718');fr(J.hx,J.hy,f,0,-2,2,2,'#ffd23f')}
+  if(g.belt==='sash'){limb(J.hx-f*5,J.hy-2,J.hx-f*(9+Math.sin(a.t*5)*1.5),J.hy+9,3,d.acc,f)}
+  if(g.chain){for(let i=0;i<5;i++){const t=i/4,px=lerp(J.hx-f*5,J.hx+f*5,t),py=J.hy-1+Math.sin(t*3.14)*4;rect(px,py,2,2,i%2?'#cfd6e8':'#7f88a8')}}
+  if(g.pads){const c=d.acc;[[J.sx,J.sy-1],[J.sx-f*6,J.sy-1]].forEach((p,i)=>{
+      disc(p[0],p[1],4,'#0d0718');disc(p[0],p[1],3,i?dk(c,.3):c);rect(p[0]-1,p[1]-2,2,1,'#fff');
+      if(g.pads==='spike'){line(p[0],p[1]-2,p[0]+(i?-f:f)*2,p[1]-9,3,'#0d0718');line(p[0],p[1]-2,p[0]+(i?-f:f)*2,p[1]-8,1,lt(c,.4))}})}
+}
+function gearHands(a,J,f){
+  const g=GEAR[a.d.name],d=a.d;
+  if(g&&g.glove){const c=gcol(g.glove,d);
+    [[J.aB,1],[J.aF,0]].forEach(([A,bk])=>{rect(A[2]-3,A[3]-3,6,6,'#0d0718');rect(A[2]-2,A[3]-2,4,4,bk?dk(c,.25):c);rect(A[2]-3,A[3]-5,6,2,'#0d0718');rect(A[2]-2,A[3]-5,4,1,lt(c,.3))})}
+  if(g&&g.tat){for(let i=0;i<3;i++){const px=lerp(J.aF[0],J.aF[2],.3+i*.22),py=lerp(J.aF[1],J.aF[3],.3+i*.22);line(px-2,py-1,px+2,py+1,1,d.acc)}}
+  if(g&&g.knee){rect(J.lF[0]-3,J.lF[1]-2,6,5,'#0d0718');rect(J.lF[0]-2,J.lF[1]-1,4,3,d.acc)}
+  rect(J.lF[2]-3,J.lF[3]-5,6,2,lt(d.boot,.3));   // revers de botte
+}
+function gearHead(a,hx,hy,f,hurt){
+  const g=GEAR[a.d.name];if(!g)return;const d=a.d,c=gcol(g.hc||'A',d);
+  if(g.mask){fr(hx,hy,f,-5,1,10,5,'#0d0718');fr(hx,hy,f,-4,2,8,3,gcol(g.mask,d))}
+  if(g.eyeglow&&!hurt){const e=gcol(g.eyeglow,d);cx.globalAlpha*=.5;disc(hx+f*3,hy-1,6,e);cx.globalAlpha=Math.min(1,cx.globalAlpha*2);fr(hx,hy,f,1,-2,4,3,e);fr(hx,hy,f,2,-2,2,2,'#fff')}
+  if(g.ear){fr(hx,hy,f,-5,0,2,3,'#ffd23f');fr(hx,hy,f,-5,3,1,2,lt('#ffd23f',.3))}
+  const h=g.head;
+  if(h==='shades'){fr(hx,hy,f,-1,-4,7,4,'#0d0718');fr(hx,hy,f,0,-3,5,2,c);fr(hx,hy,f,1,-3,2,1,'#fff');fr(hx,hy,f,-5,-3,5,1,'#0d0718')}
+  else if(h==='goggles'){rect(hx-6,hy-5,12,1,'#0d0718');rect(hx-6,hy-4,12,1,dk(c,.5));fr(hx,hy,f,1,-6,5,5,'#0d0718');fr(hx,hy,f,2,-5,3,3,c);fr(hx,hy,f,2,-5,1,1,'#fff')}
+  else if(h==='band'){rect(hx-6,hy-6,12,3,'#0d0718');rect(hx-6,hy-5,12,2,c);rect(hx-1,hy-5,3,2,lt(c,.4));
+    for(let i=0;i<(g.tails?4:2);i++){const px=hx-f*(6+i*3),py=hy-5+Math.sin(a.t*9+i*1.2)*(1.5+i*.5)+i*.8;rect(px-1,py-1,4,3,'#0d0718');rect(px,py,2,1,c)}}
+  else if(h==='cap'){rect(hx-7,hy-10,14,7,'#0d0718');rect(hx-6,hy-9,12,5,c);rect(hx-6,hy-9,12,1,lt(c,.35));fr(hx,hy,f,2,-5,8,3,'#0d0718');fr(hx,hy,f,2,-5,7,2,dk(c,.25))}
+  else if(h==='hat'){rect(hx-11,hy-7,22,3,'#0d0718');rect(hx-10,hy-6,20,1,lt(c,.2));rect(hx-10,hy-6,20,1,c);rect(hx-6,hy-14,12,8,'#0d0718');rect(hx-5,hy-13,10,6,c);rect(hx-5,hy-9,10,2,dk(c,.4))}
+  else if(h==='crown'){for(let i=-1;i<=1;i++){line(hx+i*4,hy-6,hx+i*4,hy-11-(i===0?3:0),4,'#0d0718');line(hx+i*4,hy-6,hx+i*4,hy-10-(i===0?3:0),2,c)}rect(hx-5,hy-7,10,2,c)}
+  else if(h==='eyepatch'){fr(hx,hy,f,1,-4,5,5,'#0d0718');line(hx-5,hy-5,hx+5,hy-1,1,'#0d0718')}
+}
 /* ===== 4 : sons (WebAudio synthétisé) ===== */
 const SND={ctx:null,on:true,master:null,mus:null};
 function sndInit(){
