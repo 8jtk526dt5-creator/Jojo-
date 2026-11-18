@@ -1233,6 +1233,7 @@ function updFoe(a,o,dt){
 function updProj(dt){
   G.proj=G.proj.filter(p=>{
     if(p.own.frozen>0)return true;
+    if(G.timeStop>0&&p.own===G.tsOwner){p.hang=(p.hang||0)+dt;return true}   // le temps est arrêté : même ses couteaux restent suspendus
     const t=p.own===me?foe:me;
     if(p.arm>0)p.arm-=dt;
     if(p.g)p.vy+=p.g*dt;
@@ -1438,7 +1439,9 @@ function throwPose(a){a.atk=ATK[1];a.dealt=true;a.queued=false;setSt(a,'atk',.26
 const SPEC={
   knife(a,o,p){
     throwPose(a);
-    G.proj.push({x:a.x+a.f*12,y:a.y-30,vx:a.f*340,vy:0,r:3,dmg:p.dmg*dmgScaleOf(a),col:p.col,own:a,life:1.4,knife:true});
+    const mk=(k)=>({x:a.x+a.f*12,y:a.y-30+k*0,vx:a.f*340,vy:0,r:3,dmg:p.dmg*dmgScaleOf(a)*(a.d.name==='CRONOS'?.7:1),col:p.col,own:a,life:1.4,knife:true});
+    G.proj.push(mk(0));
+    if(a.d.name==='CRONOS')[1,2].forEach(k=>after(k*.13,()=>{if(a.hp>0&&a.frozen<=0){sfx.swing();const q=mk(k);q.x=a.x+a.f*12;q.y=a.y-30+(k===1?-5:5);G.proj.push(q)}}));
   },
   orb(a,o,p){
     throwPose(a);
