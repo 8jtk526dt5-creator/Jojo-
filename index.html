@@ -1029,7 +1029,7 @@ function strike(a,o,dmg,kb,launch,heavy,ub){
   }
   const d=dmg*(a.boost>0?2:1);
   o.hp=Math.max(0,o.hp-d);
-  a.ult=Math.min(100,a.ult+d*(a.isFoe?1.0*D().ult:1.6));o.ult=Math.min(100,o.ult+d*.8);
+  if(!(a.ultUntil>performance.now())){a.ult=Math.min(100,a.ult+d*(a.isFoe?1.0*D().ult:1.6));o.ult=Math.min(100,o.ult+d*.8)}   // l'ultime ne recharge pas la jauge d'ultime
   a.comboN++;a.comboT=1.2;o.comboN=0;
   impact(ix,hy,heavy,a.isFoe?'#ff2e93':'#ffd23f');
   (heavy?sfx.heavy:sfx.hit)();
@@ -1157,7 +1157,7 @@ function updPlayer(a,o,dt){
 }
 function castUlt(a){
   if(NET.on&&!a.net)NET.cur.ev.push('pose');
-  a.ult=0;a.standOn=true;a.standT=Math.max(a.standT,.6);G.mode='pose';G.pose=1.5;G.castBy=a;
+  a.ult=0;a.ultUntil=performance.now()+4500;a.standOn=true;a.standT=Math.max(a.standT,.6);G.mode='pose';G.pose=1.5;G.castBy=a;
   setSt(a,'pose',0);a.vx=0;sfx.charge();G.flash=.15;
 }
 function finishUlt(){
