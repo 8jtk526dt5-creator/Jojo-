@@ -1861,7 +1861,7 @@ function render(){
    que tes coups lui font (dégâts, gel, poison…) lui est envoyé sous forme de petits messages numérotés. */
 const NET={on:false,room:null,code:'',started:false,seq:0,out:[],seen:0,acc:0,rdy:0,peerRdy:0,re:0,peerRe:0,pick:0,peerPick:null,
   score:[0,0],cur:{hp:0,set:{},ev:[]},applying:0,peerId:null,myId:null,last:0,unsub:null};
-const FWD=new Set(['st','stT','stDur','vx','vy','x','y','frozen','fzHits','fzCol','fzType','poison','dps','slow','atk','queued','guarding','ducking']);
+const FWD=new Set(['st','stT','stDur','vx','vy','x','y','frozen','fzHits','fzCol','fzType','poison','dps','slow','atk','queued','guarding']);
 const NUMK=new Set(['stT','stDur','vx','vy','x','y','frozen','fzHits','poison','dps','slow']);
 const STATES=new Set(['idle','walk','jump','atk','hurt','block','dash','down','getup','ko','pose']);
 const r1=v=>Math.round((+v||0)*10)/10,r2=v=>Math.round((+v||0)*100)/100;
@@ -1888,7 +1888,7 @@ function netFlush(){
 function snapOf(a){
   return{x:r1(a.x),y:r1(a.y),vx:r1(a.vx),vy:r1(a.vy),f:a.f,st:a.st,sT:r2(a.stT),sD:r2(a.stDur||0),
     ak:a.atk?(a.atk===RUSH_BIG?'B':a.atk===RUSH?'R':a.atk.id):-1,hp:r1(a.hp),mx:a.max,so:a.standOn?1:0,sl:a.standLock?1:0,
-    g:r1(a.gauge),u:r1(a.ult),fz:r2(a.frozen),fc:a.fzCol||0,ft:a.fzType||0,gd:a.guarding?1:0,iv:r2(a.inv),
+    g:r1(a.gauge),u:r1(a.ult),fz:r2(a.frozen),fc:a.fzCol||0,ft:a.fzType||0,gd:a.guarding?1:0,dk:a.ducking?1:0,iv:r2(a.inv),
     ct:r2(a.counter||0),sh:r2(a.shieldT||0),bo:r2(a.boost||0),sw:r2(a.slow||0),hs:r2(a.haste||0),po:r2(a.poison||0)};
 }
 function ser(o){const r={};for(const k in o){const v=o[k];if(typeof v==='number'&&isFinite(v))r[k]=r1(v);else if(typeof v==='boolean')r[k]=v;else if(typeof v==='string'&&v.length<24)r[k]=v}return r}
@@ -1913,7 +1913,7 @@ function netApplySnap(s){
     g.max=s.mx>0?s.mx:g.max;
     g.hp=NET.out.some(o=>o.h<0)?Math.min(g.hp,s.hp):s.hp;
     g.standOn=!!s.so;g.standLock=!!s.sl;g.gauge=s.g;g.ult=s.u;g.frozen=s.fz;g.fzCol=s.fc||null;g.fzType=s.ft||null;
-    g.guarding=!!s.gd;g.inv=s.iv;g.counter=s.ct;g.shieldT=s.sh;g.boost=s.bo;g.slow=s.sw;g.haste=s.hs;g.poison=s.po;
+    g.guarding=!!s.gd;g.ducking=!!s.dk;g.inv=s.iv;g.counter=s.ct;g.shieldT=s.sh;g.boost=s.bo;g.slow=s.sw;g.haste=s.hs;g.poison=s.po;
   });
 }
 function netGhostStep(dt){
@@ -2195,10 +2195,11 @@ document.querySelectorAll('[data-k]').forEach(el=>{
 });
 const KM={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',
   KeyJ:'hit',KeyK:'rush',KeyI:'spec',KeyL:'ult',KeyS:'guard',ArrowDown:'duck',KeyC:'duck',ShiftLeft:'guard',KeyU:'dash',KeyE:'dash',KeyQ:'stand',KeyO:'stand'};
-addEventListener('keydown',e=>{const k=KM[e.code];if(k){e.preventDefault();sndInit();inp[k]=true}});
-addEventListener('keyup',e=>{const k=KM[e.code];if(k&&HELD[k])inp[k]=false});
+addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;const k=KM[e.code];if(k){e.preventDefault();sndInit();inp[k]=true}});
+addEventListener('keyup',e=>{if(e.target&&e.target.tagName==='INPUT')return;const k=KM[e.code];if(k&&HELD[k])inp[k]=false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
-document.addEventListener('touchmove',e=>{if(!e.target.closest('#grid'))e.preventDefault()},{passive:false});
+document.addEventListener('touchmove',e=>{if(!e.target.closest('#grid,#select,#lobby'))e.preventDefault()},{passive:false});
+addEventListener('blur',()=>{inp.left=inp.right=inp.guard=inp.duck=false});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){inp.left=inp.right=inp.guard=inp.duck=false}});
 
 /* ---------- sélection du combattant ---------- */
