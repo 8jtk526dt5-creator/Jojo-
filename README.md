@@ -49,36 +49,36 @@ L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le
 
 | # | Combattant | Stand | Spécial | Ultime | Effet de l'ultime |
 | --- | --- | --- | --- | --- | --- |
-| 1 | CRONOS | TIC-TAC | COUTEAU (projectile rapide) | LE TEMPS S'ARRÊTE | Arrête le temps 3,6 s : l'adversaire est figé, tes coups font double et tombent d'un coup à la reprise. |
-| 2 | MIRELLA | ROSE NOIRE | TROIS ÉPINES (trois projectiles en éventail) | RAYON ÉCARLATE | Un rayon écarlate traverse l'arène. Saute pour l'éviter. |
-| 3 | KAÏTO VANCE | HORLOGE VIDE | PAS EFFACÉ (téléportation dans le dos de l'adversaire) | LE TEMPS EFFACÉ | Efface 1,6 s de temps : l'adversaire ne voit rien venir et tes coups font double. |
-| 4 | LUNA FERRO | SABLIER | GOUTTE DE SABLE (soigne un peu) | RETOUR EN ARRIÈRE | Remonte le temps : tu retrouves la vie que tu avais il y a 4 secondes et repousses l'adversaire. |
-| 5 | DOC MARROW | SUTURE | POINT DE SUTURE (soigne un peu) | CHIRURGIE ÉCLAIR | Recoud tes blessures : tu regagnes environ 40 % de ta vie et ta jauge de Stand se remplit. |
-| 6 | BRUTUS KANE | GRANITE | CHARGE DE GRANIT (charge en avant) | POING DE GRANIT | Fonce et écrase l'adversaire d'un poing de granit (40 dégâts, grosse projection). |
-| 7 | NOX VESPER | ÉCLIPSE | PAS D'OMBRE (téléportation dans le dos de l'adversaire) | ÉCLIPSE TOTALE | Disparaît et réapparaît dans ton dos : trois coups puis une projection. |
-| 8 | DOCTEUR ORAGE | FOUDRE MÈRE | BOULE DE FOUDRE (boule d'énergie) | TEMPÊTE | Trois coups de foudre tombent successivement sur l'adversaire. Il doit bouger ou sauter. |
-| 9 | ZÉPHYRINE | CYCLONE | LAMES DE VENT (trois projectiles en éventail) | TORNADE RASANTE | Une tornade rase le sol et projette l'adversaire. Saute par-dessus. |
-| 10 | IGNACE BRAISE | HAUT-FOURNEAU | BOULET DE FEU (projectile en arc qui explose au sol) | MUR DE FLAMMES | Un mur de flammes avance au ras du sol. Saute pour l'éviter. |
-| 11 | GLACIA NORD | HIVER ÉTERNEL | GLAÇON (projectile rapide) | GEL ÉTERNEL | Fige l'adversaire dans la glace 2,4 s. Il ne peut plus bouger, il est projeté au dégel. |
-| 12 | VOLT KÉROS | ÉTINCELLE | ÉTINCELLE (boule d'énergie) | DÉCHARGE | Paralyse l'adversaire 2,2 s d'une décharge électrique : il ne peut plus bouger. |
-| 13 | ORCHIDÉE LAM | VENIN D'ORCHIDÉE | SPORE VÉNÉNEUSE (piège posé au sol) | VENIN LENT | Empoisonne l'adversaire 7 s : il perd de la vie en continu et tu en récupères une partie. |
-| 14 | SANGUIN REX | SOIF ROUGE | GOUTTES DE SANG (boule d'énergie) | SAIGNÉE | Un rayon sombre qui te rend 80 % des dégâts infligés en vie. |
-| 15 | PERLE ABYSSE | MARÉE NOIRE | BULLE D'EAU (projectile en arc qui explose au sol) | EAU LOURDE | Ralentit l'adversaire de moitié pendant 7 s : il bouge et frappe au ralenti. |
-| 16 | GRAVIT HELM | POIDS MORT | PIÈGE LOURD (piège posé au sol) | GRAVITÉ ÉCRASANTE | Plaque l'adversaire au sol : 26 dégâts et près de 2 s à terre pour le frapper. |
-| 17 | ARGUS PRISM | MIROIR BRISÉ | ÉCLAT DE MIROIR (projectile rapide) | RENVOI | Un miroir te protège 4 s : les coups reçus de face sont renvoyés à l'adversaire. |
-| 18 | TURBO LÉO | VITESSE LIMITE | CHARGE TURBO (charge en avant) | ACCÉLÉRATION | Accélère 6,5 s : tu bouges et frappes une fois et demie plus vite. |
-| 19 | BASTIEN MURE | MURAILLE | COUP MONTANT (coup montant) | FORTERESSE | Une muraille t'entoure 3,2 s : tu es invincible et ta jauge de Stand se remplit. |
-| 20 | STELLA POLARIS | ÉTOILE FILANTE | ÉTOILES (trois projectiles en éventail) | PLUIE D'ÉTOILES | Six étoiles filantes à tête chercheuse. Esquive pour en éviter. |
-| 21 | OSSIAN GRAVE | SQUELETTE ROI | OS LANCÉ (projectile rapide) | RAFALE DES MORTS | Se jette sur l'adversaire et le martèle d'une longue rafale de poings fantômes. |
-| 22 | MAGNUS PÔLE | AIMANT | CROCHET MAGNÉTIQUE (coup montant) | ATTRACTION FATALE | Attire l'adversaire contre toi puis le martèle d'une rafale. |
-| 23 | AYAME SORA | LAME DU VENT | TROIS LAMES (trois projectiles en éventail) | MILLE LAMES | Apparaît dans ton dos et enchaîne quatre coups de lame avant de projeter. |
-| 24 | DJANGO CALIBRE | SIX COUPS | TIR RAPIDE (projectile rapide) | SIX COUPS | Six balles dorées à tête chercheuse tirées coup sur coup. |
-| 25 | FRIDA PUMA | COBRA ROYAL | SERPENT EN EMBUSCADE (piège posé au sol) | MORSURE ROYALE | Un venin plus violent : 5 s de poison, plus de dégâts par seconde. |
-| 26 | BARON SABLE | DÉSERT VIVANT | BOULE DE SABLE (projectile en arc qui explose au sol) | MUR DE SABLE | Un mur de sable rase le sol et projette l'adversaire. Saute par-dessus. |
-| 27 | HELIOS AURÉ | SOLEIL FINAL | SPHÈRE SOLAIRE (boule d'énergie) | RAYON SOLAIRE | Un énorme rayon doré (42 dégâts). Saute pour l'éviter. |
-| 28 | NÉMÉSIS NEUF | RÉVERBÉRATION | ÉCHO (téléportation dans le dos de l'adversaire) | ÉCHO MORTEL | Un écho te protège 5 s et renvoie 120 % des dégâts reçus de face. |
-| 29 | PIXEL RIVA | GLITCH | SAUT DE GLITCH (téléportation dans le dos de l'adversaire) | ERREUR FATALE | Se téléporte dans ton dos et frappe deux fois avant de projeter. |
-| 30 | KONRAD IRON | TITAN | UPPERCUT DU TITAN (coup montant) | POING DU TITAN | Se rue sur l'adversaire et l'écrase d'un poing géant (44 dégâts). |
+| 1 | CRONOS | TIC-TAC | TROIS COUTEAUX (trois couteaux à la suite, figés pendant l'arrêt du temps) | LE TEMPS S'ARRÊTE | Arrête le temps 3,6 s : l'adversaire est figé, tes coups font double et tombent d'un coup à la reprise. |
+| 2 | MIRELLA | ROSE NOIRE | PÉTALES NOIRS (quatre pétales à tête chercheuse) | RAYON ÉCARLATE | Un rayon écarlate traverse l'arène. Saute pour l'éviter. |
+| 3 | KAÏTO VANCE | HORLOGE VIDE | RETOUR EN ARRIÈRE (remonte le temps : récupère la vie perdue ces 4 dernières secondes) | LE TEMPS EFFACÉ | Efface 1,6 s de temps : l'adversaire ne voit rien venir et tes coups font double. |
+| 4 | LUNA FERRO | SABLIER | SABLIER FIGÉ (ralentit l'adversaire pendant 3,5 s) | RETOUR EN ARRIÈRE | Remonte le temps : tu retrouves la vie que tu avais il y a 4 secondes et repousses l'adversaire. |
+| 5 | DOC MARROW | SUTURE | POINT DE SUTURE (soigne une grosse part de vie) | CHIRURGIE ÉCLAIR | Recoud tes blessures : tu regagnes environ 40 % de ta vie et ta jauge de Stand se remplit. |
+| 6 | BRUTUS KANE | GRANITE | SECOUSSE (onde de choc au sol qui projette en l'air) | POING DE GRANIT | Fonce et écrase l'adversaire d'un poing de granit (40 dégâts, grosse projection). |
+| 7 | NOX VESPER | ÉCLIPSE | PAS D'OMBRE (disparaît, réapparaît dans le dos et frappe) | ÉCLIPSE TOTALE | Disparaît et réapparaît dans ton dos : trois coups puis une projection. |
+| 8 | DOCTEUR ORAGE | FOUDRE MÈRE | DOUBLE FOUDRE (deux éclairs tombent sur l'adversaire) | TEMPÊTE | Trois coups de foudre tombent successivement sur l'adversaire. Il doit bouger ou sauter. |
+| 9 | ZÉPHYRINE | CYCLONE | RAFALE (vent géant qui repousse très loin) | TORNADE RASANTE | Une tornade rase le sol et projette l'adversaire. Saute par-dessus. |
+| 10 | IGNACE BRAISE | HAUT-FOURNEAU | BOULET DE FEU (boule de feu en arc qui explose au sol) | MUR DE FLAMMES | Un mur de flammes avance au ras du sol. Saute pour l'éviter. |
+| 11 | GLACIA NORD | HIVER ÉTERNEL | SOUFFLE GELÉ (éclat de glace qui gèle l'adversaire) | GEL ÉTERNEL | Fige l'adversaire dans la glace 2,4 s. Il ne peut plus bouger, il est projeté au dégel. |
+| 12 | VOLT KÉROS | ÉTINCELLE | ÉTINCELLE (étincelle qui zigzague en vol) | DÉCHARGE | Paralyse l'adversaire 2,2 s d'une décharge électrique : il ne peut plus bouger. |
+| 13 | ORCHIDÉE LAM | VENIN D'ORCHIDÉE | SPORES (piège de spores qui empoisonne et ralentit) | VENIN LENT | Empoisonne l'adversaire 7 s : il perd de la vie en continu et tu en récupères une partie. |
+| 14 | SANGUIN REX | SOIF ROUGE | MORSURE ROUGE (bondit et mord : te rend la vie volée) | SAIGNÉE | Un rayon sombre qui te rend 80 % des dégâts infligés en vie. |
+| 15 | PERLE ABYSSE | MARÉE NOIRE | MARÉE NOIRE (vague lente au sol qui ralentit) | EAU LOURDE | Ralentit l'adversaire de moitié pendant 7 s : il bouge et frappe au ralenti. |
+| 16 | GRAVIT HELM | POIDS MORT | POIDS MORT (écrase l'adversaire au sol et le ralentit) | GRAVITÉ ÉCRASANTE | Plaque l'adversaire au sol : 26 dégâts et près de 2 s à terre pour le frapper. |
+| 17 | ARGUS PRISM | MIROIR BRISÉ | MIROIR BRISÉ (renvoie les coups reçus pendant 1,4 s) | RENVOI | Un miroir te protège 4 s : les coups reçus de face sont renvoyés à l'adversaire. |
+| 18 | TURBO LÉO | VITESSE LIMITE | VITESSE LIMITE (accélère fortement pendant 4,5 s) | ACCÉLÉRATION | Accélère 6,5 s : tu bouges et frappes une fois et demie plus vite. |
+| 19 | BASTIEN MURE | MURAILLE | MURAILLE (mur invulnérable pendant 1,1 s) | FORTERESSE | Une muraille t'entoure 3,2 s : tu es invincible et ta jauge de Stand se remplit. |
+| 20 | STELLA POLARIS | ÉTOILE FILANTE | ÉTOILES FILANTES (deux étoiles tombent du ciel) | PLUIE D'ÉTOILES | Six étoiles filantes à tête chercheuse. Esquive pour en éviter. |
+| 21 | OSSIAN GRAVE | SQUELETTE ROI | OS BOOMERANG (os qui touche à l'aller et au retour) | RAFALE DES MORTS | Se jette sur l'adversaire et le martèle d'une longue rafale de poings fantômes. |
+| 22 | MAGNUS PÔLE | AIMANT | ATTRACTION (attire l'adversaire contre toi et frappe) | ATTRACTION FATALE | Attire l'adversaire contre toi puis le martèle d'une rafale. |
+| 23 | AYAME SORA | LAME DU VENT | COUPE-VENT (traverse l'adversaire d'un coup de lame) | MILLE LAMES | Apparaît dans ton dos et enchaîne quatre coups de lame avant de projeter. |
+| 24 | DJANGO CALIBRE | SIX COUPS | SIX COUPS (six balles en rafale) | SIX COUPS | Six balles dorées à tête chercheuse tirées coup sur coup. |
+| 25 | FRIDA PUMA | COBRA ROYAL | CRACHAT DE COBRA (venin qui empoisonne) | MORSURE ROYALE | Un venin plus violent : 5 s de poison, plus de dégâts par seconde. |
+| 26 | BARON SABLE | DÉSERT VIVANT | SABLES MOUVANTS (piège sous les pieds de l'adversaire) | MUR DE SABLE | Un mur de sable rase le sol et projette l'adversaire. Saute par-dessus. |
+| 27 | HELIOS AURÉ | SOLEIL FINAL | SOLEIL (grosse sphère lente qui poursuit) | RAYON SOLAIRE | Un énorme rayon doré (42 dégâts). Saute pour l'éviter. |
+| 28 | NÉMÉSIS NEUF | RÉVERBÉRATION | ONDE DE CHOC (onde qui grandit et traverse) | ÉCHO MORTEL | Un écho te protège 5 s et renvoie 120 % des dégâts reçus de face. |
+| 29 | PIXEL RIVA | GLITCH | ÉCHANGE (échange les places et étourdit) | ERREUR FATALE | Se téléporte dans ton dos et frappe deux fois avant de projeter. |
+| 30 | KONRAD IRON | TITAN | MARTEAU DU TITAN (bondit et écrase le sol) | POING DU TITAN | Se rue sur l'adversaire et l'écrase d'un poing géant (44 dégâts). |
 
 Chaque Stand a sa propre silhouette (corpulence, tête, torse, mains) et ses propres accessoires : ailes, queue de serpent, cape, tentacules, engrenages, éclairs, chaînes, flammes, cristaux, anneaux.
 
