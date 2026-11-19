@@ -214,8 +214,13 @@ function limb(x0,y0,x1,y1,th,c,f){
   line(x0,y0,x1,y1,th+2,'#0d0718');
   line(x0,y0,x1,y1,th,c);
   const o=Math.max(1,th>>1);
-  line(x0-f*o+f,y0,x1-f*o+f,y1,1,dk(c));
-  if(th>=4)line(x0+f*(o-1),y0,x1+f*(o-1),y1,1,lt(c,.18));
+  // volume : terminateur sombre côté arrière, demi-teinte, lumière côté avant, éclat spéculaire
+  line(x0-f*o+f,y0,x1-f*o+f,y1,1,dk(c,.5));
+  if(th>=5)line(x0-f*(o-1)+f,y0,x1-f*(o-1)+f,y1,1,dk(c,.22));
+  if(th>=4)line(x0+f*(o-1),y0,x1+f*(o-1),y1,1,lt(c,.24));
+  if(th>=5){const mx=(x0*.4+x1*.6),my=(y0*.4+y1*.6);rect(mx+f*(o-2),my-1,1,2,lt(c,.6))}
+  // occlusion ambiante à l'articulation
+  if(th>=4){cx.globalAlpha=.28;rect(x0-(th>>1),y0-(th>>1),th,th,'#0d0718');cx.globalAlpha=1}
 }
 function disc(x,y,r,c){
   cx.fillStyle=c;
@@ -226,9 +231,11 @@ function ring(x,y,r,c,th=2){
   const n=Math.max(12,r*3);
   for(let i=0;i<n;i++){const a=i/n*6.2832;cx.fillRect(Math.round(x+Math.cos(a)*r),Math.round(y+Math.sin(a)*r*.55),th,th)}
 }
-function shadow(x,gy,w,a=.5){
-  cx.fillStyle='rgba(6,2,14,'+a+')';
-  for(let i=0;i<5;i++){const ww=Math.max(2,w-i*5);cx.fillRect(Math.round(x-ww/2),gy+i-2,ww,1)}
+function shadow(x,gy,w,a=.5,h=0){
+  const k=clamp(1-h/130,.25,1);w*=k;a*=k;
+  // ombre portée allongée (lumière venant de la gauche) puis noyau de contact
+  for(let j=-3;j<=3;j++){const ww=Math.round(w*1.5*Math.sqrt(1-(j*j)/12.25));cx.fillStyle='rgba(6,2,14,'+(a*.4)+')';cx.fillRect(Math.round(x+w*.28-ww/2),gy+j+1,ww,1)}
+  for(let j=-3;j<=3;j++){const ww=Math.round(w*Math.sqrt(1-(j*j)/12.25));cx.fillStyle='rgba(6,2,14,'+(a*.9)+')';cx.fillRect(Math.round(x-ww/2),gy+j+1,ww,1)}
 }
 
 /* ===== Roster : 30 combattants originaux, chacun avec son Stand et son pouvoir ===== */
@@ -482,7 +489,7 @@ function human(a,alpha,ns){
   const d=a.d,f=a.f,S=d.bulk,P=getPose(a),J=rigJ(a.x,a.y,f,P,S);
   const lying=a.st==='ko'||a.st==='down'||a.st==='getup';
   cx.globalAlpha=alpha==null?1:alpha;
-  if(!ns)shadow(a.x,GROUND,lying?44:28,.5*(alpha==null?1:alpha));
+  if(!ns)shadow(a.x,GROUND,lying?44:28,.55*(alpha==null?1:alpha),GROUND-a.y);
   const th=Math.round(5*S),sway=Math.sin(a.t*6)*2+(a.vx||0)*-.02*f;
   const pantsB=dk(d.pants,.3),topB=dk(d.top,.3),skinB=dk(d.skin,.25);
   gearBack(a,J,f,lying);
@@ -924,7 +931,7 @@ function musicTick(dt,round,intense){
 }
 /* ===== 5 : logique de combat ===== */
 const inp={left:false,right:false,jump:false,hit:false,rush:false,spec:false,guard:false,duck:false,dash:false,ult:false,stand:false};
-const G={mode:'menu',round:0,t:0,shake:0,hitstop:0,slow:1,slowT:0,msg:'',sub:'',msgT:0,
+const G={zoom:1,zpunch:0,mode:'menu',round:0,t:0,shake:0,hitstop:0,slow:1,slowT:0,msg:'',sub:'',msgT:0,
   parts:[],words:[],proj:[],bolts:[],ghosts:[],rings:[],bursts:[],picked:0,cam:0,diff:1,opps:[],timers:[],tsOwner:null,pose:0,flash:0,won:false,ko:0,
   timeStop:0,beam:null,castBy:null,tsTick:0};
 let me=null,foe=null;
@@ -1003,7 +1010,7 @@ function strike(a,o,dmg,kb,launch,heavy,ub){
   o.hp=Math.max(0,o.hp-d);
   if(!(a.ultUntil>performance.now())){a.ult=Math.min(100,a.ult+d*(a.isFoe?1.0*D().ult:1.6));o.ult=Math.min(100,o.ult+d*.8)}   // l'ultime ne recharge pas la jauge d'ultime
   a.comboN++;a.comboT=1.2;o.comboN=0;
-  impact(ix,hy,heavy,a.isFoe?'#ff2e93':'#ffd23f');
+  impact(ix,hy,heavy,a.isFoe?'#ff2e93':'#ffd23f');G.zpunch=Math.max(G.zpunch,heavy?.09:.035);
   (heavy?sfx.heavy:sfx.hit)();
   G.hitstop=Math.max(G.hitstop,heavy?.13:.055);
   G.shake=Math.max(G.shake,heavy?5:2.5);
@@ -1728,6 +1735,7 @@ function drawBG(i,t,camX){
   }
   // sol
   {const fx=-(((camX%W)+W)%W);cx.drawImage(L.floor,Math.round(fx),150);cx.drawImage(L.floor,Math.round(fx+W),150);cx.drawImage(L.floor,Math.round(fx+2*W),150)}
+  fx3dHaze(i);fx3dFloor(i,t,camX);
   if(i===0){ // lampadaires
     [70,330,454,714].forEach(x=>{const px=x-camX;rect(px,118,3,50,'#0d0718');rect(px-6,116,13,3,'#0d0718');
       cx.globalAlpha=.22;disc(px+1,121,16,'#ffd98a');cx.globalAlpha=1;rect(px-4,118,9,2,'#ffe9b0')});
@@ -1768,6 +1776,53 @@ function drawBGFront(i,t){
       for(let k=1;k<bgLight.seg.length;k++){const p=bgLight.seg[k-1],q=bgLight.seg[k];line(p[0],p[1],q[0],q[1],3,'rgba(160,180,255,.6)');line(p[0],p[1],q[0],q[1],1,'#ffffff')}
     }
   }
+}
+/* ===== effets pseudo-3D : sol en perspective, brume, rayons, zoom caméra ===== */
+const FXC=[['#ff4fa3','#35e0ff'],['#6aa8ff','#b9d4ff'],['#b56cff','#ff9ad8']];
+const VPY=118;                          // ligne d'horizon (point de fuite)
+function fx3dFloor(i,t,camX){
+  const c=FXC[i%3];
+  // dégradé de profondeur sur le sol
+  const g=cx.createLinearGradient(0,GROUND-2,0,H);g.addColorStop(0,'rgba(10,4,28,0)');g.addColorStop(1,'rgba(10,4,28,.55)');
+  cx.fillStyle=g;cx.fillRect(0,GROUND-2,W,H-GROUND+2);
+  // lignes de fuite : positions monde → perspective vers le point de fuite (centre écran)
+  const vpx=W/2,k=(H-VPY)/(GROUND-VPY);
+  cx.lineWidth=1;cx.strokeStyle=c[0];
+  for(let wx=-40;wx<=WORLD+40;wx+=32){
+    const sx=wx-camX;if(sx<-260||sx>W+260)continue;
+    const bx=vpx+(sx-vpx)*k;
+    cx.globalAlpha=.34;cx.beginPath();cx.moveTo(Math.round(sx)+.5,GROUND);cx.lineTo(Math.round(bx)+.5,H);cx.stroke();
+  }
+  // lignes horizontales : espacement qui croît avec la proximité
+  for(let n=0;n<7;n++){
+    const z=((n+(t*.35)%1)/7);                 // 0 loin → 1 proche (défile doucement)
+    const y=GROUND+Math.pow(z,1.7)*(H-GROUND);
+    cx.globalAlpha=.12+z*.3;cx.strokeStyle=c[1];cx.beginPath();cx.moveTo(0,Math.round(y)+.5);cx.lineTo(W,Math.round(y)+.5);cx.stroke();
+  }
+  cx.globalAlpha=1;
+  // liseré lumineux à la jonction mur/sol
+  cx.globalAlpha=.5;rect(0,GROUND-1,W,1,c[1]);cx.globalAlpha=.18;rect(0,GROUND-3,W,2,c[0]);cx.globalAlpha=1;
+}
+function fx3dHaze(i){   // perspective atmosphérique : brume à l'horizon
+  const c=FXC[i%3][0];
+  const g=cx.createLinearGradient(0,96,0,GROUND);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);
+  cx.globalAlpha=.16;cx.fillStyle=g;cx.fillRect(0,96,W,GROUND-96);cx.globalAlpha=1;
+}
+function fx3dShafts(i,t,camX){   // rayons de lumière en parallaxe
+  cx.save();cx.globalCompositeOperation='lighter';
+  for(let k=0;k<3;k++){
+    const x=(60+k*150-camX*.12+Math.sin(t*.3+k)*8);
+    const g=cx.createLinearGradient(x,0,x+50,H);g.addColorStop(0,'rgba(255,200,240,.10)');g.addColorStop(1,'rgba(255,200,240,0)');
+    cx.fillStyle=g;cx.beginPath();cx.moveTo(x,0);cx.lineTo(x+26,0);cx.lineTo(x+86,H);cx.lineTo(x+20,H);cx.closePath();cx.fill();
+  }
+  cx.restore();
+}
+function fx3dCamUpdate(dt){      // le zoom suit la distance entre les combattants (travelling)
+  if(!me||!foe)return;
+  const d=Math.abs(me.x-foe.x);
+  const tgt=G.mode==='fight'?1+clamp((200-d)/200,0,1)*.13:1;
+  G.zpunch=Math.max(0,G.zpunch-dt*.35);
+  G.zoom=lerp(G.zoom,tgt,1-Math.exp(-dt*3.5));
 }
 /* ===== 7 : rendu, effets, HUD ===== */
 function txt(s,x,y,size,col,align,sh){
@@ -1912,7 +1967,10 @@ function render(){
   if(G.shake>0)cx.translate(Math.round(rnd(-1,1)*G.shake),Math.round(rnd(-1,1)*G.shake));
   const stage=G.mode==='menu'?0:(G.round%3);
   const camX=G.cam;
-  drawBG(stage,G.t,camX);
+  const zm=(G.zoom||1)+(G.zpunch||0);
+  cx.save();
+  if(zm>1.001){const px=clamp(((me&&foe)?(me.x+foe.x)/2:W/2)-camX,60,W-60);cx.translate(px,GROUND);cx.scale(zm,zm);cx.translate(-px,-GROUND)}
+  drawBG(stage,G.t,camX);fx3dShafts(stage,G.t,camX);
   cx.save();cx.translate(-Math.round(camX),0);
   if(me&&foe){
     drawBolts();
@@ -1933,6 +1991,7 @@ function render(){
   G.words.forEach(w=>txt(w.s,w.x,w.y-(1-w.t/w.max)*18,13,w.col,'center','#0d0718'));
   cx.restore();
   drawBGFront(stage,G.t);
+  cx.restore();
   bloom();
   cx.drawImage(VIG,0,0);
   if(G.timeStop>0){
@@ -2229,7 +2288,7 @@ function updCam(dt){
   G.cam=lerp(G.cam,t,1-Math.exp(-dt*8));
 }
 function tick(rdt){
-  G.t+=rdt;updCam(rdt);netTick(rdt);
+  G.t+=rdt;updCam(rdt);fx3dCamUpdate(rdt);netTick(rdt);
   if(G.shake>0)G.shake=Math.max(0,G.shake-rdt*26);
   if(G.flash>0)G.flash-=rdt;
   if(G.msgT>0)G.msgT-=rdt;

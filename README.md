@@ -83,3 +83,6 @@ L'arène fait deux fois la largeur de l'écran : la caméra suit le combat et le
 Chaque Stand a sa propre silhouette (corpulence, tête, torse, mains) et ses propres accessoires : ailes, queue de serpent, cape, tentacules, engrenages, éclairs, chaînes, flammes, cristaux, anneaux.
 
 Tous les personnages et les Stands sont originaux.
+
+## Graphismes 2.5D
+Mélange 3D/2D : sol en perspective (lignes de fuite néon), brume d'horizon, rayons de lumière en parallaxe, ombres douces et projetées (selon la hauteur), volume sur les membres (ombre, demi-teinte, lumière, éclat), zoom caméra dynamique selon la distance et "punch" sur les coups.
