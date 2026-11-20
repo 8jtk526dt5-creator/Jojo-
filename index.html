@@ -1010,7 +1010,7 @@ function strike(a,o,dmg,kb,launch,heavy,ub){
   o.hp=Math.max(0,o.hp-d);
   if(!(a.ultUntil>performance.now())){a.ult=Math.min(100,a.ult+d*(a.isFoe?1.0*D().ult:1.6));o.ult=Math.min(100,o.ult+d*.8)}   // l'ultime ne recharge pas la jauge d'ultime
   a.comboN++;a.comboT=1.2;o.comboN=0;
-  impact(ix,hy,heavy,a.isFoe?'#ff2e93':'#ffd23f');G.zpunch=Math.max(G.zpunch,heavy?.09:.035);
+  impact(ix,hy,heavy,a.isFoe?'#ff2e93':'#ffd23f');if(heavy)G.zpunch=Math.max(G.zpunch,.045);
   (heavy?sfx.heavy:sfx.hit)();
   G.hitstop=Math.max(G.hitstop,heavy?.13:.055);
   G.shake=Math.max(G.shake,heavy?5:2.5);
@@ -1820,7 +1820,7 @@ function fx3dShafts(i,t,camX){   // rayons de lumière en parallaxe
 function fx3dCamUpdate(dt){      // le zoom suit la distance entre les combattants (travelling)
   if(!me||!foe)return;
   const d=Math.abs(me.x-foe.x);
-  const tgt=G.mode==='fight'?1+clamp((200-d)/200,0,1)*.13:1;
+  const tgt=G.mode==='fight'?1+clamp((120-d)/120,0,1)*.05:1;
   G.zpunch=Math.max(0,G.zpunch-dt*.35);
   G.zoom=lerp(G.zoom,tgt,1-Math.exp(-dt*3.5));
 }
